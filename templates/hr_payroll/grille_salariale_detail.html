@@ -1,0 +1,133 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-eye me-2"></i>Détail de la Grille Salariale</h2>
+                <div>
+                    <a href="{% url 'hr_payroll:grille_salariale_list' %}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                    {% if grille.pk %}
+                    <a href="{% url 'hr_payroll:grille_salariale_update' grille.pk %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    <a href="{% url 'hr_payroll:grille_salariale_delete' grille.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Informations de la Grille Salariale
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-3">Informations du grade</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Grade :</strong></td>
+                                            <td>{{ grille.grade.nom }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Code :</strong></td>
+                                            <td>{{ grille.grade.code }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Niveau :</strong></td>
+                                            <td>{{ grille.grade.niveau }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Description :</strong></td>
+                                            <td>{{ grille.grade.description|default:'-' }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-3">Informations de l'élément de paie</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Élément :</strong></td>
+                                            <td>{{ grille.element_paie.nom }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Code :</strong></td>
+                                            <td>{{ grille.element_paie.code }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Type :</strong></td>
+                                            <td>
+                                                <span class="badge {% if grille.element_paie.type_element == 'GAIN' %}bg-success{% elif grille.element_paie.type_element == 'RETENUE' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                    {{ grille.element_paie.get_type_element_display }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Calculable :</strong></td>
+                                            <td>
+                                                {% if grille.element_paie.calculable %}
+                                                <span class="badge bg-success">Oui</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Non</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-3">Montants et calculs</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Montant :</strong></td>
+                                            <td class="fw-bold text-primary fs-5">{{ grille.montant|floatformat:2 }} FC</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Statut :</strong></td>
+                                            <td>
+                                                {% if grille.actif %}
+                                                <span class="badge bg-success">Actif</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Inactif</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <!-- Suppression de la colonne Période de validité (date_debut/date_fin) -->
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h6 class="text-muted mb-3">Informations système</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Date de création :</strong></td>
+                                            <td>{{ grille.date_creation|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Dernière modification :</strong></td>
+                                            <td>{{ grille.date_modification|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

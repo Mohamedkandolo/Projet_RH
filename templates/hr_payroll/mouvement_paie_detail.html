@@ -1,0 +1,121 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-eye me-2"></i>Détail du Mouvement de Paie</h2>
+                <div>
+                    <a href="{% url 'hr_payroll:mouvement_paie_list' %}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                    {% if mouvement.pk %}
+                    <a href="{% url 'hr_payroll:mouvement_paie_update' mouvement.pk %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    <a href="{% url 'hr_payroll:mouvement_paie_delete' mouvement.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Informations du Mouvement
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-3">Informations de base</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Période :</strong></td>
+                                            <td>{{ mouvement.periode }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Agent :</strong></td>
+                                            <td>{{ mouvement.agent.nom_complet }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Élément de paie :</strong></td>
+                                            <td>{{ mouvement.element_paie.nom }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Type :</strong></td>
+                                            <td>
+                                                <span class="badge {% if mouvement.element_paie.type_element == 'GAIN' %}bg-success{% elif mouvement.element_paie.type_element == 'RETENUE' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                    {{ mouvement.element_paie.get_type_element_display }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-3">Montants et calculs</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Montant :</strong></td>
+                                            <td class="fw-bold text-primary">{{ mouvement.montant|floatformat:2 }} FC</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Quantité :</strong></td>
+                                            <td>{{ mouvement.quantite|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Base de calcul :</strong></td>
+                                            <td>{{ mouvement.base_calcul|floatformat:2|default:'-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Pourcentage :</strong></td>
+                                            <td>{{ mouvement.pourcentage|floatformat:2|default:'-' }}%</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {% if mouvement.commentaire %}
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h6 class="text-muted mb-3">Commentaire</h6>
+                                    <div class="alert alert-info">
+                                        {{ mouvement.commentaire|linebreaks }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h6 class="text-muted mb-3">Informations système</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Date de création :</strong></td>
+                                            <td>{{ mouvement.date_creation|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Dernière modification :</strong></td>
+                                            <td>{{ mouvement.date_modification|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                        {% if mouvement.cree_par %}
+                                        <tr>
+                                            <td><strong>Créé par :</strong></td>
+                                            <td>{{ mouvement.cree_par.get_full_name|default:mouvement.cree_par.username }}</td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

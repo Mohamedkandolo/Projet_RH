@@ -1,0 +1,417 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}Portal Agent - {{ agent.nom_complet }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -20px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #007bff;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #007bff;
+}
+
+.timeline-content {
+    padding-left: 10px;
+}
+
+.timeline-title {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.timeline-text {
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar avec informations de l'agent -->
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if agent.photo_identite %}
+                        <img src="{{ agent.photo_identite.url }}" 
+                             class="rounded-circle mb-3" width="120" height="120" 
+                             alt="{{ agent.nom_complet }}">
+                    {% else %}
+                        <div class="bg-secondary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                             style="width: 120px; height: 120px;">
+                            <i class="fas fa-user fa-3x text-white"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5 class="card-title">{{ agent.nom_complet }}</h5>
+                    <p class="text-muted mb-2">{{ agent.grade.nom }}</p>
+                    <p class="text-muted mb-3">{{ agent.bureau.nom }}</p>
+                    
+                    <div class="d-grid">
+                        <span class="badge {% if agent.statut == 'ACTIF' %}bg-success{% else %}bg-danger{% endif %} mb-2">
+                            {{ agent.get_statut_display }}
+                        </span>
+                        <small class="text-muted">Matricule: {{ agent.matricule }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu de navigation -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-bars me-2"></i>Navigation
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="#informations" class="list-group-item list-group-item-action" data-bs-toggle="collapse">
+                            <i class="fas fa-info-circle me-2"></i>Informations Personnelles
+                        </a>
+                        <a href="#carriere" class="list-group-item list-group-item-action" data-bs-toggle="collapse">
+                            <i class="fas fa-briefcase me-2"></i>Carrière
+                        </a>
+                        <a href="#competences" class="list-group-item list-group-item-action" data-bs-toggle="collapse">
+                            <i class="fas fa-brain me-2"></i>Compétences
+                        </a>
+                        <a href="#formations" class="list-group-item list-group-item-action" data-bs-toggle="collapse">
+                            <i class="fas fa-graduation-cap me-2"></i>Formations
+                        </a>
+                        <a href="#evaluations" class="list-group-item list-group-item-action" data-bs-toggle="collapse">
+                            <i class="fas fa-star me-2"></i>Évaluations
+                        </a>
+                        <a href="#paie" class="list-group-item list-group-item-action" data-bs-toggle="collapse">
+                            <i class="fas fa-money-bill me-2"></i>Paie
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="col-lg-9">
+            <!-- Informations personnelles -->
+            <div class="card mb-4" id="informations">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Informations Personnelles
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Date de naissance :</dt>
+                                <dd class="col-sm-8">{{ agent.date_naissance|date:"d/m/Y" }}</dd>
+                                
+                                <dt class="col-sm-4">Lieu de naissance :</dt>
+                                <dd class="col-sm-8">{{ agent.lieu_naissance }}</dd>
+                                
+                                <dt class="col-sm-4">Sexe :</dt>
+                                <dd class="col-sm-8">{{ agent.get_sexe_display }}</dd>
+                                
+                                <dt class="col-sm-4">Nationalité :</dt>
+                                <dd class="col-sm-8">{{ agent.nationalite }}</dd>
+                                
+                                <dt class="col-sm-4">État civil :</dt>
+                                <dd class="col-sm-8">{{ agent.get_etat_civil_display }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Adresse :</dt>
+                                <dd class="col-sm-8">{{ agent.adresse }}</dd>
+                                
+                                <dt class="col-sm-4">Téléphone :</dt>
+                                <dd class="col-sm-8">{{ agent.telephone|default:"Non renseigné" }}</dd>
+                                
+                                <dt class="col-sm-4">Email :</dt>
+                                <dd class="col-sm-8">{{ agent.email|default:"Non renseigné" }}</dd>
+                                
+                                <dt class="col-sm-4">Date d'embauche :</dt>
+                                <dd class="col-sm-8">{{ agent.date_embauche|date:"d/m/Y" }}</dd>
+                                
+                                <dt class="col-sm-4">Date de nomination :</dt>
+                                <dd class="col-sm-8">{{ agent.date_nomination|date:"d/m/Y"|default:"Non renseignée" }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrière -->
+            <div class="card mb-4" id="carriere">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-briefcase me-2"></i>Carrière
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Affectations</h6>
+                            {% if agent.affectations.all %}
+                                <div class="timeline">
+                                    {% for affectation in agent.affectations.all|slice:":5" %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="timeline-title">{{ affectation.bureau.nom }}</h6>
+                                            <p class="timeline-text">{{ affectation.date_debut|date:"d/m/Y" }} - {{ affectation.date_fin|date:"d/m/Y"|default:"En cours" }}</p>
+                                            {% if affectation.fonctions_exercees %}
+                                                <small class="text-muted">{{ affectation.fonctions_exercees|truncatechars:100 }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">Aucune affectation enregistrée</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Promotions</h6>
+                            {% if agent.promotions.all %}
+                                <div class="timeline">
+                                    {% for promotion in agent.promotions.all|slice:":5" %}
+                                    <div class="timeline-item">
+                                        <div class="timeline-marker bg-success"></div>
+                                        <div class="timeline-content">
+                                            <h6 class="timeline-title">{{ promotion.grade_nouveau.nom }}</h6>
+                                            <p class="timeline-text">{{ promotion.date_promotion|date:"d/m/Y" }}</p>
+                                            <small class="text-muted">{{ promotion.get_type_promotion_display }}</small>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">Aucune promotion enregistrée</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compétences -->
+            <div class="card mb-4" id="competences">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-brain me-2"></i>Compétences
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if agent.competences.all %}
+                        <div class="row">
+                            {% for competence_agent in agent.competences.all %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ competence_agent.competence.nom }}</h6>
+                                        <p class="card-text">
+                                            <small class="text-muted">{{ competence_agent.competence.get_categorie_display }}</small>
+                                        </p>
+                                        <div class="progress mb-2" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {% widthratio competence_agent.niveau_maitrise 5 100 %}%"
+                                                 aria-valuenow="{{ competence_agent.niveau_maitrise }}" 
+                                                 aria-valuemin="0" aria-valuemax="5">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">
+                                            Niveau {{ competence_agent.niveau_maitrise }}/5 - 
+                                            Évalué le {{ competence_agent.date_evaluation|date:"d/m/Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune compétence évaluée</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Formations -->
+            <div class="card mb-4" id="formations">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>Formations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if agent.participations_formations.all %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Formation</th>
+                                        <th>Type</th>
+                                        <th>Période</th>
+                                        <th>Statut</th>
+                                        <th>Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for participation in agent.participations_formations.all|slice:":10" %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ participation.formation.intitule }}</strong>
+                                            <br><small class="text-muted">{{ participation.formation.code }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ participation.formation.get_type_formation_display }}</span>
+                                        </td>
+                                        <td>
+                                            {{ participation.formation.date_debut|date:"d/m/Y" }} - {{ participation.formation.date_fin|date:"d/m/Y" }}
+                                        </td>
+                                        <td>
+                                            {% if participation.statut_participation == 'TERMINEE' %}
+                                                <span class="badge bg-success">Terminée</span>
+                                            {% elif participation.statut_participation == 'EN_COURS' %}
+                                                <span class="badge bg-warning">En cours</span>
+                                            {% else %}
+                                                <span class="badge bg-info">{{ participation.get_statut_participation_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if participation.note_formation %}
+                                                <span class="badge {% if participation.note_formation >= 16 %}bg-success{% elif participation.note_formation >= 12 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    {{ participation.note_formation }}/20
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune formation suivie</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Évaluations -->
+            <div class="card mb-4" id="evaluations">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-star me-2"></i>Évaluations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if agent.cotations.all %}
+                        <div class="row">
+                            {% for cotation in agent.cotations.all|slice:":5" %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-0">
+                                                {{ cotation.annee }}
+                                                {% if cotation.semestre %}{{ cotation.get_semestre_display }}{% endif %}
+                                            </h6>
+                                            {% if cotation.note_globale %}
+                                                <span class="badge {% if cotation.note_globale >= 16 %}bg-success{% elif cotation.note_globale >= 12 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    {{ cotation.note_globale }}/20
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <small class="text-muted">Comportement</small>
+                                                <div class="fw-bold">{{ cotation.comportement_professionnel }}/20</div>
+                                            </div>
+                                            <div class="col-4">
+                                                <small class="text-muted">Assiduité</small>
+                                                <div class="fw-bold">{{ cotation.assiduite }}/20</div>
+                                            </div>
+                                            <div class="col-4">
+                                                <small class="text-muted">Résultats</small>
+                                                <div class="fw-bold">{{ cotation.resultats_objectifs }}/20</div>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if cotation.appreciations %}
+                                            <hr>
+                                            <small class="text-muted">{{ cotation.appreciations|truncatechars:150 }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune évaluation enregistrée</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Paie -->
+            <div class="card mb-4" id="paie">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-money-bill me-2"></i>Informations de Paie
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Derniers bulletins</h6>
+                            {% if agent.bulletins.all %}
+                                <div class="list-group list-group-flush">
+                                    {% for bulletin in agent.bulletins.all|slice:":5" %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ bulletin.periode }}</strong>
+                                            <br><small class="text-muted">{{ bulletin.date_calcul|date:"d/m/Y" }}</small>
+                                        </div>
+                                        <span class="badge bg-primary">{{ bulletin.net_a_payer }} €</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">Aucun bulletin disponible</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Informations bancaires</h6>
+                            <dl class="row">
+                                <dt class="col-sm-4">Banque :</dt>
+                                <dd class="col-sm-8">{{ agent.banque|default:"Non renseignée" }}</dd>
+                                
+                                <dt class="col-sm-4">Compte :</dt>
+                                <dd class="col-sm-8">{{ agent.numero_compte|default:"Non renseigné" }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

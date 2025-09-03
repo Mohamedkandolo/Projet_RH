@@ -1,0 +1,86 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lock me-2"></i>Confirmer la fermeture
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>Fermeture de période</h6>
+                        <p class="mb-0">Vous êtes sur le point de fermer la période de paie :</p>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ periode }}</h6>
+                            <p class="card-text">
+                                <strong>Année :</strong> {{ periode.annee }}<br>
+                                <strong>Mois :</strong> {{ periode.get_mois_display }}<br>
+                                <strong>Période :</strong> {{ periode.date_debut|date:"d/m/Y" }} - {{ periode.date_fin|date:"d/m/Y" }}<br>
+                                <strong>Statut actuel :</strong> 
+                                <span class="badge bg-success">{{ periode.get_statut_display }}</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Conséquences de la fermeture :</h6>
+                        <ul class="mb-0">
+                            <li>Aucun nouveau mouvement de paie ne pourra être ajouté</li>
+                            <li>Les bulletins de paie pourront être calculés</li>
+                            <li>La période passera au statut "FERMEE"</li>
+                            <li>Cette action peut être annulée en rouvrant la période</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistiques</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Mouvements :</strong> {{ periode.mouvements.count }}</p>
+                                    <p><strong>Agents concernés :</strong> {{ periode.mouvements.values.agent.distinct.count }}</p>
+                                    <p><strong>Bulletins :</strong> {{ periode.bulletins.count }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-check-circle me-2"></i>Actions possibles</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><i class="fas fa-calculator text-success"></i> Calculer les bulletins</p>
+                                    <p><i class="fas fa-file-pdf text-primary"></i> Générer les rapports</p>
+                                    <p><i class="fas fa-archive text-warning"></i> Archiver la période</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'hr_payroll:periode_paie_detail' periode.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-lock me-1"></i>Confirmer la fermeture
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

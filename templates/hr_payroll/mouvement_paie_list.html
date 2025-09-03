@@ -1,0 +1,142 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-list me-2"></i>Mouvements de Paie</h2>
+                <a href="{% url 'hr_payroll:mouvement_paie_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nouveau Mouvement
+                </a>
+            </div>
+
+            <!-- Formulaire de recherche -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="fas fa-search me-2"></i>Recherche et Filtres</h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="{{ form.periode.id_for_label }}" class="form-label">Période</label>
+                            {{ form.periode }}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="{{ form.agent.id_for_label }}" class="form-label">Agent</label>
+                            {{ form.agent }}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="{{ form.element_paie.id_for_label }}" class="form-label">Élément de paie</label>
+                            {{ form.element_paie }}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="{{ form.type_element.id_for_label }}" class="form-label">Type</label>
+                            {{ form.type_element }}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Rechercher
+                            </button>
+                            <a href="{% url 'hr_payroll:mouvement_paie_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Effacer
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des mouvements -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Mouvements de Paie</h5>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Période</th>
+                                    <th>Agent</th>
+                                    <th>Élément de paie</th>
+                                    <th>Type</th>
+                                    <th>Montant</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mouvement in page_obj %}
+                                <tr>
+                                    <td>{{ mouvement.periode }}</td>
+                                    <td>{{ mouvement.agent.nom_complet }}</td>
+                                    <td>{{ mouvement.element_paie.nom }}</td>
+                                    <td>
+                                        <span class="badge {% if mouvement.element_paie.type_element == 'GAIN' %}bg-success{% elif mouvement.element_paie.type_element == 'RETENUE' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ mouvement.element_paie.get_type_element_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ mouvement.montant|floatformat:2 }} FC</td>
+                                    <td>
+                                        <a href="{% url 'hr_payroll:mouvement_paie_detail' mouvement.pk %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if mouvement.pk %}
+                                        <a href="{% url 'hr_payroll:mouvement_paie_update' mouvement.pk %}" class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'hr_payroll:mouvement_paie_delete' mouvement.pk %}" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Pagination des mouvements">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucun mouvement de paie trouvé. 
+                        <a href="{% url 'hr_payroll:mouvement_paie_create' %}" class="alert-link">Créer le premier mouvement</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

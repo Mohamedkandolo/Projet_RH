@@ -1,0 +1,211 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}{{ poste.intitule }} - Détail du Poste{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête avec actions -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'hr_payroll:poste_budgetaire_list' %}">Postes Budgétaires</a></li>
+                            <li class="breadcrumb-item active">{{ poste.intitule }}</li>
+                        </ol>
+                    </nav>
+                    <h2 class="mb-0">
+                        <i class="fas fa-building me-2 text-primary"></i>
+                        {{ poste.intitule }}
+                    </h2>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'hr_payroll:poste_budgetaire_update' poste.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Modifier
+                    </a>
+                    <a href="{% url 'hr_payroll:poste_budgetaire_delete' poste.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Supprimer
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informations principales -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Informations Générales
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Code :</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-info fs-6">{{ poste.code }}</span>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Type :</dt>
+                                        <dd class="col-sm-8">
+                                            {% if poste.type_poste == 'PERMANENT' %}
+                                                <span class="badge bg-success">Permanent</span>
+                                            {% elif poste.type_poste == 'CONTRACTUEL' %}
+                                                <span class="badge bg-warning">Contractuel</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Stagiaire</span>
+                                            {% endif %}
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Grade Requis :</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-secondary">{{ poste.grade_requis.nom }}</span>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Statut :</dt>
+                                        <dd class="col-sm-8">
+                                            {% if poste.pourvu %}
+                                                <span class="badge bg-danger">Pourvu</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Disponible</span>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Bureau :</dt>
+                                        <dd class="col-sm-8">
+                                            <a href="{% url 'hr_payroll:bureau_detail' poste.bureau.pk %}" class="text-decoration-none">
+                                                {{ poste.bureau.nom }}
+                                            </a>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Direction :</dt>
+                                        <dd class="col-sm-8">
+                                            <a href="{% url 'hr_payroll:direction_detail' poste.bureau.direction.pk %}" class="text-decoration-none">
+                                                {{ poste.bureau.direction.nom }}
+                                            </a>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Position :</dt>
+                                        <dd class="col-sm-8">{{ poste.position_hierarchique|default:"Non spécifiée" }}</dd>
+                                        
+                                        <dt class="col-sm-4">Créé le :</dt>
+                                        <dd class="col-sm-8">{{ poste.date_creation|date:"d/m/Y H:i" }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Missions et responsabilités -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tasks me-2"></i>Missions et Responsabilités
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ poste.missions|linebreaks }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Compétences requises -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-brain me-2"></i>Compétences Requises
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ poste.competences_requises|linebreaks }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar avec informations complémentaires -->
+                <div class="col-lg-4">
+                    <!-- Agents affectés -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>Agents Affectés
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if poste.agents.all %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for agent in poste.agents.all %}
+                                    <li class="mb-2">
+                                        <a href="{% url 'hr_payroll:agent_detail' agent.pk %}" class="text-decoration-none">
+                                            <i class="fas fa-user me-2 text-primary"></i>
+                                            {{ agent.nom_complet }}
+                                        </a>
+                                        <br>
+                                        <small class="text-muted">{{ agent.grade.nom }}</small>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted mb-0">Aucun agent affecté</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Affectations -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-exchange-alt me-2"></i>Historique des Affectations
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if poste.affectations.all %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for affectation in poste.affectations.all|slice:":5" %}
+                                    <li class="mb-2">
+                                        <small class="text-muted">{{ affectation.date_debut|date:"d/m/Y" }}</small>
+                                        <br>
+                                        <a href="{% url 'hr_payroll:agent_detail' affectation.agent.pk %}" class="text-decoration-none">
+                                            {{ affectation.agent.nom_complet }}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                {% if poste.affectations.count > 5 %}
+                                    <small class="text-muted">Et {{ poste.affectations.count|add:"-5" }} autres...</small>
+                                {% endif %}
+                            {% else %}
+                                <p class="text-muted mb-0">Aucune affectation</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Actions rapides -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>Actions Rapides
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'hr_payroll:affectation_create' %}?poste={{ poste.pk }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-user-plus me-2"></i>Affecter un agent
+                                </a>
+                                <a href="{% url 'hr_payroll:poste_budgetaire_list' %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list me-2"></i>Retour à la liste
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

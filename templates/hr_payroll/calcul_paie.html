@@ -1,0 +1,174 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+
+{% block page_title %}Calcul de Paie{% endblock %}
+
+{% block page_actions %}
+    <a href="{% url 'hr_payroll:periode_paie_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour aux Périodes
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Informations importantes -->
+        <div class="alert alert-info">
+            <h6 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>Informations importantes
+            </h6>
+            <p class="mb-0">
+                <strong>Le calcul de paie :</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Calcule les bulletins de paie basés sur les mouvements existants</li>
+                    <li>Ne crée pas automatiquement de nouveaux mouvements</li>
+                    <li>Assurez-vous d'avoir ajouté des mouvements de paie avant le calcul</li>
+                    <li>Les bulletins existants seront mis à jour si "Forcer le recalcul" est coché</li>
+                </ul>
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-calculator me-2"></i>Calcul de Paie
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Période de paie -->
+                    <div class="mb-3">
+                        <label for="{{ form.periode.id_for_label }}" class="form-label">
+                            <strong>{{ form.periode.label }}</strong>
+                        </label>
+                        {{ form.periode }}
+                        {% if form.periode.errors %}
+                        <div class="text-danger">
+                            {% for error in form.periode.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Sélectionnez la période pour laquelle calculer les bulletins de paie
+                        </small>
+                    </div>
+
+                    <!-- Agent spécifique (optionnel) -->
+                    <div class="mb-3">
+                        <label for="{{ form.agent.id_for_label }}" class="form-label">
+                            <strong>{{ form.agent.label }}</strong>
+                        </label>
+                        {{ form.agent }}
+                        {% if form.agent.errors %}
+                        <div class="text-danger">
+                            {% for error in form.agent.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Laissez vide pour calculer tous les agents (si "Calculer tous" est coché)
+                        </small>
+                    </div>
+
+                    <!-- Options de calcul -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.calculer_tous }}
+                                    <label class="form-check-label" for="{{ form.calculer_tous.id_for_label }}">
+                                        <strong>{{ form.calculer_tous.label }}</strong>
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Calculer les bulletins pour tous les agents actifs
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {{ form.forcer_recalcul }}
+                                    <label class="form-check-label" for="{{ form.forcer_recalcul.id_for_label }}">
+                                        <strong>{{ form.forcer_recalcul.label }}</strong>
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Recalculer même si un bulletin existe déjà
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Boutons d'action -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'hr_payroll:periode_paie_list' %}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calculator me-2"></i>Calculer les Bulletins
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Aide et liens utiles -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-secondary">
+                    <i class="fas fa-question-circle me-2"></i>Aide et Liens Utiles
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Avant le calcul :</h6>
+                        <ul>
+                            <li><a href="{% url 'hr_payroll:mouvement_paie_list' %}">Vérifier les mouvements de paie</a></li>
+                            <li><a href="{% url 'hr_payroll:agent_list' %}">Vérifier les agents actifs</a></li>
+                            <li><a href="{% url 'hr_payroll:element_paie_list' %}">Vérifier les éléments de paie</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Après le calcul :</h6>
+                        <ul>
+                            <li><a href="{% url 'hr_payroll:periode_paie_list' %}">Voir les périodes de paie</a></li>
+                            <li><a href="{% url 'hr_payroll:rapports' %}">Générer des rapports</a></li>
+                            <li><a href="{% url 'hr_payroll:archivage' %}">Archiver les données</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calculerTous = document.getElementById('id_calculer_tous');
+        const agentField = document.getElementById('id_agent');
+        function toggleAgentField() {
+            if (calculerTous && agentField) {
+                if (calculerTous.checked) {
+                    agentField.disabled = true;
+                    agentField.parentElement.style.opacity = 0.5;
+                } else {
+                    agentField.disabled = false;
+                    agentField.parentElement.style.opacity = 1;
+                }
+            }
+        }
+        if (calculerTous && agentField) {
+            calculerTous.addEventListener('change', toggleAgentField);
+            toggleAgentField();
+        }
+    });
+</script>
+{% endblock %}

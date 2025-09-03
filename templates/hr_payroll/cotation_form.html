@@ -1,0 +1,280 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-star-half-alt me-2"></i>{{ title }}</h2>
+                <a href="{% url 'hr_payroll:cotation_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>{{ title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Informations de base -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-info-circle me-2"></i>Informations de Base</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.agent.id_for_label }}" class="form-label">
+                                                <strong>Agent *</strong>
+                                            </label>
+                                            {{ form.agent }}
+                                            {% if form.agent.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.agent.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.periode_evaluation.id_for_label }}" class="form-label">
+                                                <strong>Période d'évaluation *</strong>
+                                            </label>
+                                            {{ form.periode_evaluation }}
+                                            {% if form.periode_evaluation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.periode_evaluation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.annee.id_for_label }}" class="form-label">
+                                                <strong>Année *</strong>
+                                            </label>
+                                            {{ form.annee }}
+                                            {% if form.annee.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.annee.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.semestre.id_for_label }}" class="form-label">
+                                                <strong>Semestre</strong>
+                                            </label>
+                                            {{ form.semestre }}
+                                            {% if form.semestre.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.semestre.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Laissez vide pour une évaluation annuelle</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Critères d'évaluation -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-chart-line me-2"></i>Critères d'Évaluation (Note sur 20)</h6>
+                                        <p class="text-muted small">Évaluez chaque critère sur une échelle de 0 à 20</p>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.comportement_professionnel.id_for_label }}" class="form-label">
+                                                <strong>Comportement Professionnel *</strong>
+                                            </label>
+                                            {{ form.comportement_professionnel }}
+                                            {% if form.comportement_professionnel.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.comportement_professionnel.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Attitude, éthique, respect des règles</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.assiduite.id_for_label }}" class="form-label">
+                                                <strong>Assiduité *</strong>
+                                            </label>
+                                            {{ form.assiduite }}
+                                            {% if form.assiduite.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.assiduite.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Présence, ponctualité, régularité</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.resultats_objectifs.id_for_label }}" class="form-label">
+                                                <strong>Résultats et Objectifs *</strong>
+                                            </label>
+                                            {{ form.resultats_objectifs }}
+                                            {% if form.resultats_objectifs.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.resultats_objectifs.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Atteinte des objectifs fixés</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.qualite_travail.id_for_label }}" class="form-label">
+                                                <strong>Qualité du Travail *</strong>
+                                            </label>
+                                            {{ form.qualite_travail }}
+                                            {% if form.qualite_travail.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.qualite_travail.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Précision, soin, finition</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.esprit_equipe.id_for_label }}" class="form-label">
+                                                <strong>Esprit d'Équipe *</strong>
+                                            </label>
+                                            {{ form.esprit_equipe }}
+                                            {% if form.esprit_equipe.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.esprit_equipe.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Collaboration, communication, solidarité</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Appréciations -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-comments me-2"></i>Appréciations et Commentaires</h6>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="{{ form.appreciations.id_for_label }}" class="form-label">
+                                                <strong>Appréciations Générales *</strong>
+                                            </label>
+                                            {{ form.appreciations }}
+                                            {% if form.appreciations.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.appreciations.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Synthèse générale de l'évaluation</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.points_forts.id_for_label }}" class="form-label">
+                                                <strong>Points Forts</strong>
+                                            </label>
+                                            {{ form.points_forts }}
+                                            {% if form.points_forts.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.points_forts.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Compétences et qualités remarquables</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.points_amelioration.id_for_label }}" class="form-label">
+                                                <strong>Points d'Amélioration</strong>
+                                            </label>
+                                            {{ form.points_amelioration }}
+                                            {% if form.points_amelioration.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.points_amelioration.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Axes de progression identifiés</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Note globale calculée -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-calculator me-2"></i>
+                                            <strong>Note Globale :</strong> 
+                                            La note globale sera automatiquement calculée à partir de la moyenne des 5 critères d'évaluation.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Boutons d'action -->
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if cotation %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                        <a href="{% url 'hr_payroll:cotation_list' %}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>Annuler
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

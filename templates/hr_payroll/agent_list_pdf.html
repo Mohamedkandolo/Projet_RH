@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Liste des Agents</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 6px;
+      text-align: left;
+      font-size: 12px;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .chip {
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: #fff;
+    }
+    .blue { background-color: #0d6efd; }
+    .green { background-color: #198754; }
+    .red { background-color: #dc3545; }
+    .gray { background-color: #6c757d; }
+  </style>
+</head>
+<body>
+  <h2>Liste des Agents</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Matricule</th>
+        <th>Nom complet</th>
+        <th>Email</th>
+        <th>Grade</th>
+        <th>Bureau</th>
+        <th>Statut</th>
+        <th>Date d'embauche</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in agents %}
+      <tr>
+        <td>{{ a.matricule }}</td>
+        <td>
+          <strong>{{ a.nom_complet }}</strong><br>
+          {% if a.telephone %}<small>{{ a.telephone }}</small>{% endif %}
+        </td>
+        <td>{{ a.email }}</td>
+        <td>
+          {% if a.grade %}
+            <span class="chip blue">{{ a.grade }}</span>
+          {% else %}
+            <span class="chip gray">-</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if a.bureau %}
+            {{ a.bureau.nom }}<br>
+            <small>{{ a.bureau.direction }}</small>
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td>
+          {% if a.is_active %}
+            <span class="chip green">Actif</span>
+          {% else %}
+            <span class="chip red">Inactif</span>
+          {% endif %}
+        </td>
+        <td>{{ a.date_embauche|date:"d/m/Y" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" style="text-align:center;">Aucun agent trouvé</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

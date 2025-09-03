@@ -1,0 +1,224 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-arrow-up me-2"></i>{{ title }}</h2>
+                <a href="{% url 'hr_payroll:promotion_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>{{ title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Informations de base -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-info-circle me-2"></i>Informations de Base</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.agent.id_for_label }}" class="form-label">
+                                                <strong>Agent *</strong>
+                                            </label>
+                                            {{ form.agent }}
+                                            {% if form.agent.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.agent.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.type_promotion.id_for_label }}" class="form-label">
+                                                <strong>Type de Promotion *</strong>
+                                            </label>
+                                            {{ form.type_promotion }}
+                                            {% if form.type_promotion.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.type_promotion.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.date_promotion.id_for_label }}" class="form-label">
+                                                <strong>Date de Promotion *</strong>
+                                            </label>
+                                            {{ form.date_promotion }}
+                                            {% if form.date_promotion.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.date_promotion.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Grades -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-star me-2"></i>Grades</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.grade_ancien.id_for_label }}" class="form-label">
+                                                <strong>Grade Ancien</strong>
+                                            </label>
+                                            {{ form.grade_ancien }}
+                                            {% if form.grade_ancien.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.grade_ancien.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Grade actuel de l'agent</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.grade_nouveau.id_for_label }}" class="form-label">
+                                                <strong>Grade Nouveau *</strong>
+                                            </label>
+                                            {{ form.grade_nouveau }}
+                                            {% if form.grade_nouveau.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.grade_nouveau.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Grade après promotion</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Critères d'éligibilité -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-check-circle me-2"></i>Critères d'Éligibilité</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.anciennete_requise.id_for_label }}" class="form-label">
+                                                <strong>Ancienneté Requise *</strong>
+                                            </label>
+                                            {{ form.anciennete_requise }}
+                                            {% if form.anciennete_requise.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.anciennete_requise.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Ancienneté minimale en années</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.notation_requise.id_for_label }}" class="form-label">
+                                                <strong>Notation Requise *</strong>
+                                            </label>
+                                            {{ form.notation_requise }}
+                                            {% if form.notation_requise.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.notation_requise.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Note minimale requise sur 20</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Justification -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-file-alt me-2"></i>Justification</h6>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="{{ form.motif_promotion.id_for_label }}" class="form-label">
+                                                <strong>Motif de la Promotion *</strong>
+                                            </label>
+                                            {{ form.motif_promotion }}
+                                            {% if form.motif_promotion.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.motif_promotion.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Justification détaillée de la promotion</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.decision_promotion.id_for_label }}" class="form-label">
+                                                <strong>Décision de Promotion</strong>
+                                            </label>
+                                            {{ form.decision_promotion }}
+                                            {% if form.decision_promotion.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.decision_promotion.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Référence de la décision (arrêté, note, etc.)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Boutons d'action -->
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if promotion %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                        <a href="{% url 'hr_payroll:promotion_list' %}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>Annuler
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

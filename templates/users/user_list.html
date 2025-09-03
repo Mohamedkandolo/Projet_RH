@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Utilisateurs - MiKanda{% endblock %}
+
+{% block content %}
+<!-- En-tête avec actions -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-users me-2"></i>Gestion des utilisateurs</h2>
+        <p class="text-muted">Administration des comptes utilisateurs et des rôles</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'users:user_create' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Nouvel utilisateur
+        </a>
+    </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ users.count }}</h3>
+                    <p class="mb-0">Total Utilisateurs</p>
+                </div>
+                <i class="fas fa-users fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ users|dictsort:"role"|length }}</h3>
+                    <p class="mb-0">Actifs</p>
+                </div>
+                <i class="fas fa-user-check fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ users|dictsort:"role"|length }}</h3>
+                    <p class="mb-0">Archivistes</p>
+                </div>
+                <i class="fas fa-user-shield fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3>{{ users|dictsort:"role"|length }}</h3>
+                    <p class="mb-0">Admins</p>
+                </div>
+                <i class="fas fa-user-cog fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des utilisateurs -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>Liste des utilisateurs
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Rôle</th>
+                        <th>Service</th>
+                        <th>Email</th>
+                        <th>Date création</th>
+                        <th>Statut</th>
+                        <th width="150">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar me-3">
+                                    <i class="fas fa-user-circle fa-2x text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+                                    <small class="text-muted">@{{ user.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if user.role == 'admin' %}
+                                <span class="badge bg-danger">Administrateur</span>
+                            {% elif user.role == 'archiviste' %}
+                                <span class="badge bg-warning">Archiviste</span>
+                            {% elif user.role == 'utilisateur' %}
+                                <span class="badge bg-info">Utilisateur</span>
+                            {% elif user.role == 'consultant' %}
+                                <span class="badge bg-secondary">Consultant</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.service %}
+                                <span class="badge bg-light text-dark">{{ user.service }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="mailto:{{ user.email }}" class="text-decoration-none">
+                                {{ user.email }}
+                            </a>
+                        </td>
+                        <td>{{ user.date_creation|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="badge bg-success">Actif</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'users:user_detail' user.id %}" class="btn btn-outline-info" title="Détails">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                                <a href="{% url 'users:prof' user.id %}" class="btn btn-outline-primary" title="Profil">
+                                    <i class="fas fa-user"></i>
+                                </a>
+                                <a href="{% url 'users:user_edit' user.id %}" class="btn btn-outline-secondary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if user != request.user %}
+                                <button type="button" class="btn btn-outline-danger" title="Désactiver" 
+                                        onclick="toggleUserStatus({{ user.id }}, '{{ user.username }}')">
+                                    <i class="fas fa-user-slash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmAction">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleUserStatus(userId, username) {
+    const modal = new bootstrap.Modal(document.getElementById('userModal'));
+    const modalMessage = document.getElementById('modalMessage');
+    const confirmBtn = document.getElementById('confirmAction');
+    
+    modalMessage.textContent = `Êtes-vous sûr de vouloir désactiver l'utilisateur "${username}" ?`;
+    confirmBtn.onclick = function() {
+        // Ici vous pouvez ajouter une requête AJAX pour désactiver l'utilisateur
+        alert('Fonctionnalité de désactivation à implémenter');
+        modal.hide();
+    };
+    
+    modal.show();
+}
+
+// Recherche en temps réel
+$(document).ready(function() {
+    $('#searchUser').on('keyup', function() {
+        const value = $(this).val().toLowerCase();
+        $('table tbody tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+});
+</script>
+{% endblock %} 

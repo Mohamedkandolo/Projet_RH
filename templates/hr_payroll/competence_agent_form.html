@@ -1,0 +1,145 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-check me-2"></i>{{ title }}</h2>
+                <a href="{% url 'hr_payroll:competence_agent_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>{{ title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Informations de base -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-success"><i class="fas fa-info-circle me-2"></i>Informations de Base</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.agent.id_for_label }}" class="form-label">
+                                                <strong>Agent *</strong>
+                                            </label>
+                                            {{ form.agent }}
+                                            {% if form.agent.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.agent.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.competence.id_for_label }}" class="form-label">
+                                                <strong>Compétence *</strong>
+                                            </label>
+                                            {{ form.competence }}
+                                            {% if form.competence.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.competence.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Évaluation -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-success"><i class="fas fa-star me-2"></i>Évaluation de la Compétence</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.niveau_maitrise.id_for_label }}" class="form-label">
+                                                <strong>Niveau de Maîtrise *</strong>
+                                            </label>
+                                            {{ form.niveau_maitrise }}
+                                            {% if form.niveau_maitrise.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.niveau_maitrise.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.date_evaluation.id_for_label }}" class="form-label">
+                                                <strong>Date d'Évaluation *</strong>
+                                            </label>
+                                            {{ form.date_evaluation }}
+                                            {% if form.date_evaluation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.date_evaluation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Commentaires -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-success"><i class="fas fa-comments me-2"></i>Commentaires et Observations</h6>
+                                        <div class="mb-3">
+                                            <label for="{{ form.commentaires.id_for_label }}" class="form-label">
+                                                <strong>Commentaires</strong>
+                                            </label>
+                                            {{ form.commentaires }}
+                                            {% if form.commentaires.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.commentaires.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Observations sur le niveau de maîtrise et suggestions d'amélioration</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Boutons d'action -->
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-success btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if competence_agent %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                        <a href="{% url 'hr_payroll:competence_agent_list' %}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>Annuler
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,62 @@
+# French translation for Django password validation messages
+# Copyright (C) 2025 Archive System
+# This file is distributed under the same license as the Django project.
+msgid ""
+msgstr ""
+"Project-Id-Version: Django 5.2.3\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-05 01:00+0100\n"
+"PO-Revision-Date: 2025-01-05 01:00+0100\n"
+"Last-Translator: Archive System\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: django/contrib/auth/password_validation.py:131
+msgid "This password is too short. It must contain at least %(min_length)d character."
+msgid_plural "This password is too short. It must contain at least %(min_length)d characters."
+msgstr[0] "Ce mot de passe est trop court. Il doit contenir au minimum %(min_length)d caractère."
+msgstr[1] "Ce mot de passe est trop court. Il doit contenir au minimum %(min_length)d caractères."
+
+#: django/contrib/auth/password_validation.py:134
+msgid "This password is too common."
+msgstr "Ce mot de passe est trop courant."
+
+#: django/contrib/auth/password_validation.py:137
+msgid "This password is entirely numeric."
+msgstr "Ce mot de passe ne peut pas être entièrement numérique."
+
+#: django/contrib/auth/password_validation.py:140
+msgid "This password is too similar to your %(verbose_name)s."
+msgstr "Ce mot de passe est trop similaire à votre %(verbose_name)s."
+
+#: django/contrib/auth/password_validation.py:143
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Le mot de passe est trop similaire au %(verbose_name)s."
+
+#: django/contrib/auth/password_validation.py:146
+msgid "This password is too similar to your username."
+msgstr "Ce mot de passe est trop similaire à votre nom d'utilisateur."
+
+#: django/contrib/auth/password_validation.py:149
+msgid "This password is too similar to your first name."
+msgstr "Ce mot de passe est trop similaire à votre prénom."
+
+#: django/contrib/auth/password_validation.py:152
+msgid "This password is too similar to your last name."
+msgstr "Ce mot de passe est trop similaire à votre nom."
+
+#: django/contrib/auth/password_validation.py:155
+msgid "This password is too similar to your email address."
+msgstr "Ce mot de passe est trop similaire à votre adresse email."
+
+#: django/contrib/auth/forms.py:321
+msgid "The two password fields didn't match."
+msgstr "Les deux mots de passe ne correspondent pas."
+
+#: django/contrib/auth/forms.py:324
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Votre ancien mot de passe est incorrect. Veuillez le saisir à nouveau." 

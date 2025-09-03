@@ -1,0 +1,160 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}Supprimer la Compétence{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmation de Suppression
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Attention !
+                        </h5>
+                        <p class="mb-0">
+                            Vous êtes sur le point de supprimer la compétence suivante :
+                        </p>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">{{ competence.nom }}</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Code :</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-info">{{ competence.code }}</span>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Catégorie :</dt>
+                                <dd class="col-sm-8">
+                                    {% if competence.categorie == 'TECHNIQUE' %}
+                                        <span class="badge bg-primary">Technique</span>
+                                    {% elif competence.categorie == 'MANAGERIALE' %}
+                                        <span class="badge bg-success">Managériale</span>
+                                    {% elif competence.categorie == 'SPECIFIQUE' %}
+                                        <span class="badge bg-warning">Spécifique</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Générale</span>
+                                    {% endif %}
+                                </dd>
+                                
+                                <dt class="col-sm-4">Niveau d'Expertise :</dt>
+                                <dd class="col-sm-8">
+                                    {% if competence.niveau_expertise == 1 %}
+                                        <span class="badge bg-secondary">Débutant</span>
+                                    {% elif competence.niveau_expertise == 2 %}
+                                        <span class="badge bg-info">Intermédiaire</span>
+                                    {% elif competence.niveau_expertise == 3 %}
+                                        <span class="badge bg-warning">Avancé</span>
+                                    {% elif competence.niveau_expertise == 4 %}
+                                        <span class="badge bg-primary">Expert</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Maître</span>
+                                    {% endif %}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    <!-- Vérifications de sécurité -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Vérifications de Sécurité
+                        </h6>
+                        <ul class="mb-0">
+                            {% if competence.agents_competents.all %}
+                                <li class="text-danger">
+                                    <strong>⚠️ {{ competence.agents_competents.count }} agent(s) évalué(s)</strong>
+                                    <br>
+                                    <small>La suppression de cette compétence supprimera toutes les évaluations associées.</small>
+                                </li>
+                            {% else %}
+                                <li class="text-success">✅ Aucun agent évalué</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Message d'avertissement -->
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Conséquences de la Suppression
+                        </h6>
+                        <ul class="mb-0">
+                            <li>La compétence sera marquée comme inactive (suppression logique)</li>
+                            <li>Toutes les évaluations des agents seront supprimées</li>
+                            <li>Cette action est irréversible</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Formulaire de confirmation -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_delete" required>
+                            <label class="form-check-label" for="confirm_delete">
+                                <strong>Je confirme que je comprends les conséquences de cette suppression</strong>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_evaluations" required>
+                            <label class="form-check-label" for="confirm_evaluations">
+                                <strong>J'ai vérifié qu'aucun agent n'est évalué pour cette compétence</strong>
+                            </label>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'hr_payroll:competence_detail' competence.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger" id="delete_btn" disabled>
+                                <i class="fas fa-trash me-2"></i>Confirmer la Suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block hr_payroll_js %}
+<script>
+$(document).ready(function() {
+    // Activer le bouton de suppression seulement si toutes les cases sont cochées
+    function checkConfirmations() {
+        const confirmDelete = $('#confirm_delete').is(':checked');
+        const confirmEvaluations = $('#confirm_evaluations').is(':checked');
+        
+        if (confirmDelete && confirmEvaluations) {
+            $('#delete_btn').prop('disabled', false);
+        } else {
+            $('#delete_btn').prop('disabled', true);
+        }
+    }
+    
+    $('#confirm_delete, #confirm_evaluations').on('change', checkConfirmations);
+    
+    // Confirmation finale avant envoi
+    $('form').on('submit', function(e) {
+        if (!confirm('Êtes-vous absolument sûr de vouloir supprimer cette compétence ? Cette action est irréversible.')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %} 

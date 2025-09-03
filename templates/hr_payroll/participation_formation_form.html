@@ -1,0 +1,207 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-graduate me-2"></i>{{ title }}</h2>
+                <a href="{% url 'hr_payroll:participation_formation_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>{{ title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Informations de base -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-info"><i class="fas fa-info-circle me-2"></i>Informations de Base</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.agent.id_for_label }}" class="form-label">
+                                                <strong>Agent *</strong>
+                                            </label>
+                                            {{ form.agent }}
+                                            {% if form.agent.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.agent.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.formation.id_for_label }}" class="form-label">
+                                                <strong>Formation *</strong>
+                                            </label>
+                                            {{ form.formation }}
+                                            {% if form.formation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.formation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Statut et évaluation -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-info"><i class="fas fa-chart-line me-2"></i>Statut et Évaluation</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.statut_participation.id_for_label }}" class="form-label">
+                                                <strong>Statut de Participation *</strong>
+                                            </label>
+                                            {{ form.statut_participation }}
+                                            {% if form.statut_participation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.statut_participation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.note_formation.id_for_label }}" class="form-label">
+                                                <strong>Note de Formation</strong>
+                                            </label>
+                                            {{ form.note_formation }}
+                                            {% if form.note_formation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.note_formation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Note obtenue sur 20</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Appréciations -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-info"><i class="fas fa-comments me-2"></i>Appréciations et Retours</h6>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="{{ form.appreciation_formation.id_for_label }}" class="form-label">
+                                                <strong>Appréciation de la Formation</strong>
+                                            </label>
+                                            {{ form.appreciation_formation }}
+                                            {% if form.appreciation_formation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.appreciation_formation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Avis personnel sur la qualité et l'utilité de la formation</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="{{ form.impact_formation.id_for_label }}" class="form-label">
+                                                <strong>Impact de la Formation</strong>
+                                            </label>
+                                            {{ form.impact_formation }}
+                                            {% if form.impact_formation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.impact_formation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Impact sur les compétences et le travail quotidien</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="{{ form.mise_en_pratique.id_for_label }}" class="form-label">
+                                                <strong>Mise en Pratique</strong>
+                                            </label>
+                                            {{ form.mise_en_pratique }}
+                                            {% if form.mise_en_pratique.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.mise_en_pratique.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Comment les acquis de la formation sont appliqués au travail</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Coût -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-info"><i class="fas fa-dollar-sign me-2"></i>Informations Financières</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.cout_participation.id_for_label }}" class="form-label">
+                                                <strong>Coût de Participation</strong>
+                                            </label>
+                                            {{ form.cout_participation }}
+                                            {% if form.cout_participation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.cout_participation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Coût total de la participation (frais d'inscription, transport, etc.)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Boutons d'action -->
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-info btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if participation %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                        <a href="{% url 'hr_payroll:participation_formation_list' %}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>Annuler
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,186 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}Supprimer la Formation{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmation de Suppression
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Attention !
+                        </h5>
+                        <p class="mb-0">
+                            Vous êtes sur le point de supprimer la formation suivante :
+                        </p>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">{{ formation.intitule }}</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Code :</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-info">{{ formation.code }}</span>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Type :</dt>
+                                <dd class="col-sm-8">
+                                    {% if formation.type_formation == 'INTERNE' %}
+                                        <span class="badge bg-primary">Interne</span>
+                                    {% elif formation.type_formation == 'EXTERNE' %}
+                                        <span class="badge bg-warning">Externe</span>
+                                    {% elif formation.type_formation == 'CERTIFICATION' %}
+                                        <span class="badge bg-success">Certification</span>
+                                    {% else %}
+                                        <span class="badge bg-info">Conférence</span>
+                                    {% endif %}
+                                </dd>
+                                
+                                <dt class="col-sm-4">Période :</dt>
+                                <dd class="col-sm-8">
+                                    {{ formation.date_debut|date:"d/m/Y" }} - {{ formation.date_fin|date:"d/m/Y" }}
+                                </dd>
+                                
+                                <dt class="col-sm-4">Statut :</dt>
+                                <dd class="col-sm-8">
+                                    {% if formation.statut == 'PLANIFIEE' %}
+                                        <span class="badge bg-info">Planifiée</span>
+                                    {% elif formation.statut == 'EN_COURS' %}
+                                        <span class="badge bg-warning">En cours</span>
+                                    {% elif formation.statut == 'TERMINEE' %}
+                                        <span class="badge bg-success">Terminée</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Annulée</span>
+                                    {% endif %}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    <!-- Vérifications de sécurité -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Vérifications de Sécurité
+                        </h6>
+                        <ul class="mb-0">
+                            {% if formation.participants.all %}
+                                <li class="text-danger">
+                                    <strong>⚠️ {{ formation.participants.count }} participant(s) inscrit(s)</strong>
+                                    <br>
+                                    <small>La suppression de cette formation supprimera toutes les participations associées.</small>
+                                </li>
+                            {% else %}
+                                <li class="text-success">✅ Aucun participant inscrit</li>
+                            {% endif %}
+                            
+                            {% if formation.statut == 'EN_COURS' %}
+                                <li class="text-warning">
+                                    <strong>⚠️ Formation en cours</strong>
+                                    <br>
+                                    <small>Cette formation est actuellement en cours et ne devrait pas être supprimée.</small>
+                                </li>
+                            {% elif formation.statut == 'TERMINEE' %}
+                                <li class="text-info">
+                                    <strong>ℹ️ Formation terminée</strong>
+                                    <br>
+                                    <small>Cette formation est terminée, la suppression est possible.</small>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Message d'avertissement -->
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Conséquences de la Suppression
+                        </h6>
+                        <ul class="mb-0">
+                            <li>La formation sera marquée comme inactive (suppression logique)</li>
+                            <li>Toutes les participations seront supprimées</li>
+                            <li>L'historique des évaluations sera perdu</li>
+                            <li>Cette action est irréversible</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Formulaire de confirmation -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_delete" required>
+                            <label class="form-check-label" for="confirm_delete">
+                                <strong>Je confirme que je comprends les conséquences de cette suppression</strong>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_participants" required>
+                            <label class="form-check-label" for="confirm_participants">
+                                <strong>J'ai vérifié qu'aucun participant n'est inscrit à cette formation</strong>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_status" required>
+                            <label class="form-check-label" for="confirm_status">
+                                <strong>J'ai vérifié que le statut de la formation permet sa suppression</strong>
+                            </label>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'hr_payroll:formation_detail' formation.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger" id="delete_btn" disabled>
+                                <i class="fas fa-trash me-2"></i>Confirmer la Suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block hr_payroll_js %}
+<script>
+$(document).ready(function() {
+    // Activer le bouton de suppression seulement si toutes les cases sont cochées
+    function checkConfirmations() {
+        const confirmDelete = $('#confirm_delete').is(':checked');
+        const confirmParticipants = $('#confirm_participants').is(':checked');
+        const confirmStatus = $('#confirm_status').is(':checked');
+        
+        if (confirmDelete && confirmParticipants && confirmStatus) {
+            $('#delete_btn').prop('disabled', false);
+        } else {
+            $('#delete_btn').prop('disabled', true);
+        }
+    }
+    
+    $('#confirm_delete, #confirm_participants, #confirm_status').on('change', checkConfirmations);
+    
+    // Confirmation finale avant envoi
+    $('form').on('submit', function(e) {
+        if (!confirm('Êtes-vous absolument sûr de vouloir supprimer cette formation ? Cette action est irréversible.')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %} 

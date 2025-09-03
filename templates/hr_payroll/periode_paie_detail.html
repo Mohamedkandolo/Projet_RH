@@ -1,0 +1,189 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-calendar-alt me-2"></i>{{ periode }}</h2>
+                <div>
+                    <a href="{% url 'hr_payroll:periode_paie_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                    <a href="{% url 'hr_payroll:periode_paie_update' periode.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    {% if periode.statut == 'OUVERTE' %}
+                    <a href="{% url 'hr_payroll:periode_paie_fermer' periode.pk %}" class="btn btn-warning">
+                        <i class="fas fa-lock me-1"></i>Fermer la période
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Informations de la période -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header {% if periode.statut == 'OUVERTE' %}bg-success{% elif periode.statut == 'FERMEE' %}bg-warning{% else %}bg-secondary{% endif %} text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations de la Période</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Année :</strong> {{ periode.annee }}</p>
+                                    <p><strong>Mois :</strong> {{ periode.get_mois_display }}</p>
+                                    <p><strong>Date de début :</strong> {{ periode.date_debut|date:"d/m/Y" }}</p>
+                                    <p><strong>Date de fin :</strong> {{ periode.date_fin|date:"d/m/Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Statut :</strong> 
+                                        <span class="badge {% if periode.statut == 'OUVERTE' %}bg-success{% elif periode.statut == 'FERMEE' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                            {{ periode.get_statut_display }}
+                                        </span>
+                                    </p>
+                                    <p><strong>Date d'ouverture :</strong> {{ periode.date_ouverture|date:"d/m/Y H:i" }}</p>
+                                    {% if periode.date_fermeture %}
+                                    <p><strong>Date de fermeture :</strong> {{ periode.date_fermeture|date:"d/m/Y H:i" }}</p>
+                                    {% endif %}
+                                    {% if periode.date_archivage %}
+                                    <p><strong>Date d'archivage :</strong> {{ periode.date_archivage|date:"d/m/Y H:i" }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if periode.commentaire %}
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <p><strong>Commentaire :</strong> {{ periode.commentaire }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistiques</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Mouvements de paie :</strong> {{ periode.mouvements.count }}</p>
+                            <p><strong>Bulletins générés :</strong> {{ periode.bulletins.count }}</p>
+                            <p><strong>Agents concernés :</strong> {{ periode.mouvements.values.agent.distinct.count }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mouvements de paie -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Mouvements de Paie</h5>
+                            <a href="{% url 'hr_payroll:mouvement_paie_create' %}" class="btn btn-light btn-sm">
+                                <i class="fas fa-plus me-1"></i>Nouveau Mouvement
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            {% if periode.mouvements.all %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Agent</th>
+                                            <th>Élément de paie</th>
+                                            <th>Montant</th>
+                                            <th>Quantité</th>
+                                            <th>Date de création</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for mouvement in periode.mouvements.all %}
+                                        <tr>
+                                            <td>{{ mouvement.agent.nom }} {{ mouvement.agent.prenoms }}</td>
+                                            <td>{{ mouvement.element_paie.nom }}</td>
+                                            <td>{{ mouvement.montant|floatformat:0 }} FC</td>
+                                            <td>{{ mouvement.quantite }}</td>
+                                            <td>{{ mouvement.date_creation|date:"d/m/Y" }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'hr_payroll:mouvement_paie_update' mouvement.pk %}" 
+                                                       class="btn btn-sm btn-outline-warning">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'hr_payroll:mouvement_paie_delete' mouvement.pk %}" 
+                                                       class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aucun mouvement de paie pour cette période.
+                                <a href="{% url 'hr_payroll:mouvement_paie_create' %}" class="alert-link">Créer le premier mouvement</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulletins de paie -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>Bulletins de Paie</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if periode.bulletins.all %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Agent</th>
+                                            <th>Salaire brut</th>
+                                            <th>Salaire net</th>
+                                            <th>Date de calcul</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for bulletin in periode.bulletins.all %}
+                                        <tr>
+                                            <td>{{ bulletin.agent.nom }} {{ bulletin.agent.prenoms }}</td>
+                                            <td>{{ bulletin.total_gains|floatformat:0 }} FC</td>
+                                            <td>{{ bulletin.net_a_payer|floatformat:0 }} FC</td>
+                                            <td>{{ bulletin.date_calcul|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-download"></i> Télécharger
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aucun bulletin de paie généré pour cette période.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

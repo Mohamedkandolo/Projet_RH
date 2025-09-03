@@ -1,0 +1,231 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}{{ competence.nom }} - Détail de la Compétence{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête avec actions -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'hr_payroll:competence_list' %}">Compétences</a></li>
+                            <li class="breadcrumb-item active">{{ competence.nom }}</li>
+                        </ol>
+                    </nav>
+                    <h2 class="mb-0">
+                        <i class="fas fa-brain me-2 text-primary"></i>
+                        {{ competence.nom }}
+                    </h2>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'hr_payroll:competence_update' competence.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Modifier
+                    </a>
+                    <a href="{% url 'hr_payroll:competence_delete' competence.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Supprimer
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informations principales -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Informations Générales
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Code :</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-info fs-6">{{ competence.code }}</span>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Catégorie :</dt>
+                                        <dd class="col-sm-8">
+                                            {% if competence.categorie == 'TECHNIQUE' %}
+                                                <span class="badge bg-primary">Technique</span>
+                                            {% elif competence.categorie == 'MANAGERIALE' %}
+                                                <span class="badge bg-success">Managériale</span>
+                                            {% elif competence.categorie == 'SPECIFIQUE' %}
+                                                <span class="badge bg-warning">Spécifique</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Générale</span>
+                                            {% endif %}
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Niveau d'Expertise :</dt>
+                                        <dd class="col-sm-8">
+                                            {% if competence.niveau_expertise == 1 %}
+                                                <span class="badge bg-secondary">Débutant</span>
+                                            {% elif competence.niveau_expertise == 2 %}
+                                                <span class="badge bg-info">Intermédiaire</span>
+                                            {% elif competence.niveau_expertise == 3 %}
+                                                <span class="badge bg-warning">Avancé</span>
+                                            {% elif competence.niveau_expertise == 4 %}
+                                                <span class="badge bg-primary">Expert</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Maître</span>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Créé le :</dt>
+                                        <dd class="col-sm-8">{{ competence.date_creation|date:"d/m/Y H:i" }}</dd>
+                                        
+                                        <dt class="col-sm-4">Modifié le :</dt>
+                                        <dd class="col-sm-8">{{ competence.date_modification|date:"d/m/Y H:i" }}</dd>
+                                        
+                                        <dt class="col-sm-4">Statut :</dt>
+                                        <dd class="col-sm-8">
+                                            {% if competence.actif %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Inactive</span>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description détaillée -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-align-left me-2"></i>Description Détaillée
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ competence.description|linebreaks }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Agents compétents -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>Agents Compétents ({{ competence.agents_competents.count }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if competence.agents_competents.all %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Agent</th>
+                                                <th>Grade</th>
+                                                <th>Bureau</th>
+                                                <th>Niveau de Maîtrise</th>
+                                                <th>Dernière Évaluation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for competence_agent in competence.agents_competents.all %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'hr_payroll:agent_detail' competence_agent.agent.pk %}" class="text-decoration-none">
+                                                        {{ competence_agent.agent.nom_complet }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ competence_agent.agent.grade.nom }}</td>
+                                                <td>{{ competence_agent.agent.bureau.nom }}</td>
+                                                <td>
+                                                    {% if competence_agent.niveau_maitrise == 1 %}
+                                                        <span class="badge bg-secondary">Débutant</span>
+                                                    {% elif competence_agent.niveau_maitrise == 2 %}
+                                                        <span class="badge bg-info">Intermédiaire</span>
+                                                    {% elif competence_agent.niveau_maitrise == 3 %}
+                                                        <span class="badge bg-warning">Avancé</span>
+                                                    {% elif competence_agent.niveau_maitrise == 4 %}
+                                                        <span class="badge bg-primary">Expert</span>
+                                                    {% else %}
+                                                        <span class="badge bg-success">Maître</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ competence_agent.date_evaluation|date:"d/m/Y" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">Aucun agent n'a encore été évalué pour cette compétence.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar avec informations complémentaires -->
+                <div class="col-lg-4">
+                    <!-- Statistiques -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Statistiques
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h4 class="text-primary mb-0">{{ competence.agents_competents.count }}</h4>
+                                        <small class="text-muted">Agents compétents</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-success mb-0">{{ competence.niveau_expertise }}/5</h4>
+                                    <small class="text-muted">Niveau requis</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions rapides -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>Actions Rapides
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'hr_payroll:competence_agent_create' %}?competence={{ competence.pk }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-user-plus me-2"></i>Évaluer un agent
+                                </a>
+                                <a href="{% url 'hr_payroll:competence_list' %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list me-2"></i>Retour à la liste
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compétences similaires -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-link me-2"></i>Compétences Similaires
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted mb-0">Aucune compétence similaire</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

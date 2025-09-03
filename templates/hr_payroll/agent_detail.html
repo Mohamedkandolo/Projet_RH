@@ -1,0 +1,152 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user me-2"></i>Détails de l'Agent</h2>
+                <div>
+                    <a href="{% url 'hr_payroll:agent_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                    <a href="{% url 'hr_payroll:agent_update' agent.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    <a href="{% url 'hr_payroll:agent_delete' agent.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Supprimer
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informations principales -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informations Personnelles</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nom complet :</strong> {{ agent.nom }} {{ agent.prenom }}</p>
+                                    <p><strong>Matricule :</strong> {{ agent.matricule }}</p>
+                                    <p><strong>Date de naissance :</strong> {{ agent.date_naissance|date:"d/m/Y" }}</p>
+                                    <p><strong>Lieu de naissance :</strong> {{ agent.lieu_naissance }}</p>
+                                    <p><strong>Sexe :</strong> {{ agent.get_sexe_display }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Adresse :</strong> {{ agent.adresse }}</p>
+                                    <p><strong>Téléphone :</strong> {{ agent.telephone }}</p>
+                                    <p><strong>Email :</strong> {{ agent.email }}</p>
+                                    <p><strong>Statut :</strong> 
+                                        <span class="badge {% if agent.actif %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ agent.actif|yesno:"Actif,Inactif" }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="fas fa-building me-2"></i>Informations Professionnelles</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Direction :</strong> {{ agent.bureau.direction.nom }}</p>
+                            <p><strong>Bureau :</strong> {{ agent.bureau.nom }}</p>
+                            <p><strong>Grade :</strong> {{ agent.grade.nom }}</p>
+                            <p><strong>Date d'embauche :</strong> {{ agent.date_embauche|date:"d/m/Y" }}</p>
+                            <p><strong>Salaire de base :</strong> {{ agent.salaire_base|floatformat:0 }} FC</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mouvements de paie récents -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Grille Salariale</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if grille %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Elément de paie</th>
+                                            <th>Montant</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for grille in grille%}
+                                        <tr>
+                                            <td>{{ grille.element_paie.nom }}</td>
+                                            <td>{{ grille.montant|floatformat:0 }} FC</td>
+                                            
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">Aucun mouvement de paie trouvé pour cet agent.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulletins de paie -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>Bulletins de Paie</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if bulletins %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Période</th>
+                                            <th>Salaire brut</th>
+                                            <th>Salaire net</th>
+                                            <th>Date de génération</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for bulletin in bulletins %}
+                                        <tr>
+                                            <td>{{ bulletin.periode }}</td>
+                                            <td>{{ bulletin.total_gains|floatformat:0 }} FC</td>
+                                            <td>{{ bulletin.net_a_payer|floatformat:0 }} FC</td>
+                                            <td>{{ bulletin.date_calcul|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="#" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-download"></i> Télécharger
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">Aucun bulletin de paie généré pour cet agent.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

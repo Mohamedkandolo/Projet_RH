@@ -1,0 +1,108 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-table me-2"></i>Grilles Salariales</h2>
+                <a href="{% url 'hr_payroll:grille_salariale_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nouvelle Grille
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des Grilles Salariales</h5>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Élément de paie</th>
+                                    <th>Type</th>
+                                    <th>Montant</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grille in page_obj %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ grille.grade.nom }}</strong>
+                                        <br><small class="text-muted">Niveau {{ grille.grade.niveau }}</small>
+                                    </td>
+                                    <td>{{ grille.element_paie.nom }}</td>
+                                    <td>
+                                        <span class="badge {% if grille.element_paie.type_element == 'GAIN' %}bg-success{% elif grille.element_paie.type_element == 'RETENUE' %}bg-danger{% else %}bg-warning{% endif %}">
+                                            {{ grille.element_paie.get_type_element_display }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold text-primary">{{ grille.montant|floatformat:2 }} FC</td>
+                                   
+                                    <td>
+                                        <a href="{% url 'hr_payroll:grille_salariale_detail' grille.pk %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if grille.pk %}
+                                        <a href="{% url 'hr_payroll:grille_salariale_update' grille.pk %}" class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'hr_payroll:grille_salariale_delete' grille.pk %}" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <nav aria-label="Pagination des grilles salariales">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aucune grille salariale trouvée. 
+                        <a href="{% url 'hr_payroll:grille_salariale_create' %}" class="alert-link">Créer la première grille</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

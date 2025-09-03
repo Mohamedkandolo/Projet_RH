@@ -1,0 +1,54 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirmer la Suppression
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                        <h4>Êtes-vous sûr de vouloir supprimer cette cotation ?</h4>
+                        <p class="mb-0">Cette action est irréversible et supprimera définitivement l'enregistrement.</p>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h6 class="text-primary">Détails de la Cotation</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Agent :</strong> {{ cotation.agent.nom_complet }}</p>
+                                    <p><strong>Période :</strong> {{ cotation.get_periode_evaluation_display }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Année :</strong> {{ cotation.annee }}</p>
+                                    <p><strong>Semestre :</strong> {{ cotation.semestre|default:"Annuel" }}</p>
+                                </div>
+                            </div>
+                            <p><strong>Note globale :</strong> {{ cotation.note_globale|default:"Non calculée" }}/20</p>
+                            <p><strong>Appréciations :</strong> {{ cotation.appreciations|truncatewords:20 }}</p>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash me-2"></i>Confirmer la Suppression
+                            </button>
+                            <a href="{% url 'hr_payroll:cotation_list' %}" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

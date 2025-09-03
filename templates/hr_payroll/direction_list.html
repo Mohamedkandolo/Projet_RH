@@ -1,0 +1,73 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-building me-2"></i>Directions</h2>
+                <a href="{% url 'hr_payroll:direction_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Nouvelle Direction
+                </a>
+            </div>
+
+            {% if directions %}
+            <div class="row">
+                {% for direction in directions %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-building me-2"></i>{{ direction.nom }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <strong>Code :</strong> {{ direction.code }}
+                            </p>
+                            {% if direction.description %}
+                            <p class="card-text">
+                                <strong>Description :</strong> {{ direction.description|truncatewords:20 }}
+                            </p>
+                            {% endif %}
+                            <p class="card-text">
+                                <strong>Bureaux :</strong> {{ direction.bureaux.count }}
+                            </p>
+                            <p class="card-text">
+                                <strong>Agents :</strong> 
+                                {% with total_agents=direction.bureaux.all|length %}
+                                    {{ total_agents }}
+                                {% endwith %}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group w-100" role="group">
+                                <a href="{% url 'hr_payroll:direction_detail' direction.pk %}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <a href="{% url 'hr_payroll:direction_update' direction.pk %}" 
+                                   class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a href="{% url 'hr_payroll:direction_delete' direction.pk %}" 
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Aucune direction n'a été créée. 
+                <a href="{% url 'hr_payroll:direction_create' %}" class="alert-link">Créer la première direction</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

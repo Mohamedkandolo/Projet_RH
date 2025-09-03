@@ -1,0 +1,113 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-tie me-2"></i>Détail de l'Affectation</h2>
+                <div>
+                    <a href="{% url 'hr_payroll:affectation_update' affectation.pk %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit me-1"></i>Modifier
+                    </a>
+                    <a href="{% url 'hr_payroll:affectation_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informations principales -->
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Informations de l'Affectation
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Agent :</strong> {{ affectation.agent.nom_complet }}</p>
+                                    <p><strong>Bureau :</strong> {{ affectation.bureau.nom }}</p>
+                                    <p><strong>Poste budgétaire :</strong> {{ affectation.poste_budgetaire.nom|default:"Non défini" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Date de début :</strong> {{ affectation.date_debut }}</p>
+                                    <p><strong>Date de fin :</strong> {{ affectation.date_fin|default:"Non définie" }}</p>
+                                    <p><strong>Statut :</strong> 
+                                        <span class="badge {% if affectation.statut == 'ACTIVE' %}bg-success{% elif affectation.statut == 'TERMINEE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                            {{ affectation.get_statut_display }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h6>Fonctions exercées :</h6>
+                                <p class="text-muted">{{ affectation.fonctions_exercees }}</p>
+                            </div>
+                            
+                            {% if affectation.motif_affectation %}
+                            <div class="mt-3">
+                                <h6>Motif de l'affectation :</h6>
+                                <p class="text-muted">{{ affectation.motif_affectation }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if affectation.decision_affectation %}
+                            <div class="mt-3">
+                                <h6>Décision d'affectation :</h6>
+                                <p class="text-muted">{{ affectation.decision_affectation }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations complémentaires -->
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-clock me-2"></i>Traçabilité
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Date de création :</strong> {{ affectation.date_creation|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Dernière modification :</strong> {{ affectation.date_modification|date:"d/m/Y H:i" }}</p>
+                            {% if affectation.cree_par %}
+                            <p><strong>Créé par :</strong> {{ affectation.cree_par.get_full_name|default:affectation.cree_par.username }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-tools me-2"></i>Actions
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'hr_payroll:affectation_update' affectation.pk %}" class="btn btn-warning">
+                                    <i class="fas fa-edit me-2"></i>Modifier
+                                </a>
+                                {% if affectation.statut == 'ACTIVE' %}
+                                <a href="{% url 'hr_payroll:affectation_delete' affectation.pk %}" class="btn btn-danger">
+                                    <i class="fas fa-times me-2"></i>Terminer
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'hr_payroll:affectation_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-list me-2"></i>Liste des affectations
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,197 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-tie me-2"></i>{{ title }}</h2>
+                <a href="{% url 'hr_payroll:affectation_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>{{ title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Informations de l'affectation -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-info-circle me-2"></i>Informations de l'Affectation</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.agent.id_for_label }}" class="form-label">
+                                                <strong>Agent *</strong>
+                                            </label>
+                                            {{ form.agent }}
+                                            {% if form.agent.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.agent.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.bureau.id_for_label }}" class="form-label">
+                                                <strong>Bureau *</strong>
+                                            </label>
+                                            {{ form.bureau }}
+                                            {% if form.bureau.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.bureau.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.poste_budgetaire.id_for_label }}" class="form-label">
+                                                <strong>Poste Budgétaire</strong>
+                                            </label>
+                                            {{ form.poste_budgetaire }}
+                                            {% if form.poste_budgetaire.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.poste_budgetaire.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Optionnel - Laissez vide si non applicable</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.date_debut.id_for_label }}" class="form-label">
+                                                <strong>Date de début *</strong>
+                                            </label>
+                                            {{ form.date_debut }}
+                                            {% if form.date_debut.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.date_debut.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.date_fin.id_for_label }}" class="form-label">
+                                                <strong>Date de fin</strong>
+                                            </label>
+                                            {{ form.date_fin }}
+                                            {% if form.date_fin.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.date_fin.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Laissez vide si l'affectation est permanente</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Fonctions exercées -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-tasks me-2"></i>Fonctions Exercées</h6>
+                                        <div class="mb-3">
+                                            <label for="{{ form.fonctions_exercees.id_for_label }}" class="form-label">
+                                                <strong>Description des fonctions *</strong>
+                                            </label>
+                                            {{ form.fonctions_exercees }}
+                                            {% if form.fonctions_exercees.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.fonctions_exercees.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Décrivez en détail les fonctions et responsabilités de l'agent</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Décision et motif -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary"><i class="fas fa-gavel me-2"></i>Décision d'Affectation</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.motif_affectation.id_for_label }}" class="form-label">
+                                                <strong>Motif de l'affectation</strong>
+                                            </label>
+                                            {{ form.motif_affectation }}
+                                            {% if form.motif_affectation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.motif_affectation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Justification de l'affectation</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.decision_affectation.id_for_label }}" class="form-label">
+                                                <strong>Décision d'affectation</strong>
+                                            </label>
+                                            {{ form.decision_affectation }}
+                                            {% if form.decision_affectation.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.decision_affectation.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Référence de la décision (arrêté, note, etc.)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Boutons d'action -->
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if affectation %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                        <a href="{% url 'hr_payroll:affectation_list' %}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>Annuler
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

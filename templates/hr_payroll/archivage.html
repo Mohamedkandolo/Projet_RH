@@ -1,0 +1,283 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+
+{% block page_title %}Archivage des Périodes de Paie{% endblock %}
+
+{% block page_actions %}
+    <a href="{% url 'hr_payroll:periode_paie_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour aux Périodes
+    </a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-archive me-2"></i>Archivage des Périodes de Paie
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Information :</strong> L'archivage d'une période de paie permet de figer définitivement 
+                    les données de cette période. Cette action est irréversible et empêche toute modification 
+                    ultérieure des bulletins de paie de cette période.
+                </div>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.periode.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-2"></i>{{ form.periode.label }}
+                                </label>
+                                {{ form.periode }}
+                                {% if form.periode.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.periode.errors %}
+                                            <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Sélectionnez la période à archiver. Seules les périodes fermées peuvent être archivées.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.commentaire.id_for_label }}" class="form-label">
+                                    <i class="fas fa-comment me-2"></i>{{ form.commentaire.label }}
+                                </label>
+                                {{ form.commentaire }}
+                                {% if form.commentaire.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.commentaire.errors %}
+                                            <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Commentaire optionnel pour documenter l'archivage.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                        Avertissement Important
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="mb-0">
+                                        <li>L'archivage est une action <strong>irréversible</strong></li>
+                                        <li>Tous les bulletins de la période seront figés</li>
+                                        <li>Aucune modification ne sera possible après archivage</li>
+                                        <li>Les données seront sauvegardées dans l'historique</li>
+                                        <li>La période sera marquée comme "ARCHIVEE"</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'hr_payroll:periode_paie_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </a>
+                                <button type="submit" class="btn btn-warning" 
+                                        onclick="return confirm('Êtes-vous sûr de vouloir archiver cette période ? Cette action est irréversible.')">
+                                    <i class="fas fa-archive me-2"></i>Archiver la Période
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section des périodes disponibles pour archivage -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-list me-2"></i>Périodes Disponibles pour Archivage
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if periodes_fermees %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Période</th>
+                                    <th>Statut</th>
+                                    <th>Nombre de Bulletins</th>
+                                    <th>Date de Fermeture</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for periode in periodes_fermees %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ periode.annee }}/{{ periode.mois|stringformat:"02d" }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            {{ periode.date_debut|date:"d/m/Y" }} - {{ periode.date_fin|date:"d/m/Y" }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if periode.statut == 'OUVERTE' %}
+                                            <span class="badge bg-success">{{ periode.get_statut_display }}</span>
+                                        {% elif periode.statut == 'FERMEE' %}
+                                            <span class="badge bg-warning">{{ periode.get_statut_display }}</span>
+                                        {% elif periode.statut == 'ARCHIVEE' %}
+                                            <span class="badge bg-secondary">{{ periode.get_statut_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ periode.bulletins.count }} bulletins</span>
+                                    </td>
+                                    <td>
+                                        {% if periode.date_fermeture %}
+                                            <small>{{ periode.date_fermeture|date:"d/m/Y H:i" }}</small>
+                                        {% else %}
+                                            <small class="text-muted">Non fermée</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if periode.statut == 'FERMEE' %}
+                                            <a href="{% url 'hr_payroll:archivage' %}?periode={{ periode.id }}" 
+                                               class="btn btn-sm btn-warning">
+                                                <i class="fas fa-archive me-1"></i>Archiver
+                                            </a>
+                                        {% elif periode.statut == 'ARCHIVEE' %}
+                                            <span class="text-muted">
+                                                <i class="fas fa-check me-1"></i>Archivée
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>En cours
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-archive fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Aucune période disponible pour archivage</h5>
+                        <p class="text-muted">
+                            Seules les périodes fermées peuvent être archivées. 
+                            <a href="{% url 'hr_payroll:periode_paie_list' %}">Gérer les périodes</a>
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section historique des archivages -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-history me-2"></i>Historique des Archivages
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if historique_archivages %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Période</th>
+                                    <th>Agent</th>
+                                    <th>Archivé par</th>
+                                    <th>Date d'Archivage</th>
+                                    <th>Commentaire</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for archive in historique_archivages %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ archive.periode.annee }}/{{ archive.periode.mois|stringformat:"02d" }}</strong>
+                                    </td>
+                                    <td>
+                                        {{ archive.agent.nom }} {{ archive.agent.prenom }}
+                                        <br>
+                                        <small class="text-muted">{{ archive.agent.matricule }}</small>
+                                    </td>
+                                    <td>
+                                        {{ archive.archive_par.get_full_name|default:archive.archive_par.username }}
+                                    </td>
+                                    <td>
+                                        <small>{{ archive.date_archivage|date:"d/m/Y H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        {% if archive.commentaire_archivage %}
+                                            <small class="text-muted">{{ archive.commentaire_archivage|truncatechars:50 }}</small>
+                                        {% else %}
+                                            <small class="text-muted">Aucun commentaire</small>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Aucun historique d'archivage</h5>
+                        <p class="text-muted">Aucune période n'a encore été archivée.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Confirmation avant archivage
+    $('form').on('submit', function(e) {
+        if (!confirm('Êtes-vous sûr de vouloir archiver cette période ? Cette action est irréversible.')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+    // Pré-remplir la période si spécifiée dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const periodeId = urlParams.get('periode');
+    if (periodeId) {
+        $('#id_periode').val(periodeId);
+    }
+});
+</script>
+{% endblock %} 

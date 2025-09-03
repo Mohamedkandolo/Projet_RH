@@ -1,0 +1,155 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}Cotations - Évaluation des Performances{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Cotations - Évaluation des Performances
+                    </h4>
+                    <a href="{% url 'hr_payroll:cotation_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Nouvelle Cotation
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if cotations %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Agent</th>
+                                        <th>Période</th>
+                                        <th>Note Globale</th>
+                                        <th>Comportement</th>
+                                        <th>Assiduité</th>
+                                        <th>Résultats</th>
+                                        <th>Validation</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cotation in cotations %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if cotation.agent.photo_identite %}
+                                                    <img src="{{ cotation.agent.photo_identite.url }}" 
+                                                         class="rounded-circle me-2" width="32" height="32" 
+                                                         alt="{{ cotation.agent.agent.nom_complet }}">
+                                                {% else %}
+                                                    <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" 
+                                                         style="width: 32px; height: 32px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <strong>{{ cotation.agent.nom_complet }}</strong>
+                                                    <br><small class="text-muted">{{ cotation.agent.grade.nom }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>{{ cotation.annee }}</strong>
+                                            {% if cotation.semestre %}
+                                                <br><small class="text-muted">{{ cotation.get_semestre_display }}</small>
+                                            {% endif %}
+                                            <br><small class="text-muted">{{ cotation.get_periode_evaluation_display }}</small>
+                                        </td>
+                                        <td>
+                                            {% if cotation.note_globale %}
+                                                <span class="badge {% if cotation.note_globale >= 16 %}bg-success{% elif cotation.note_globale >= 12 %}bg-warning{% else %}bg-danger{% endif %} fs-6">
+                                                    {{ cotation.note_globale }}/20
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">Non calculée</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if cotation.comportement_professionnel >= 16 %}bg-success{% elif cotation.comportement_professionnel >= 12 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ cotation.comportement_professionnel }}/20
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if cotation.assiduite >= 16 %}bg-success{% elif cotation.assiduite >= 12 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ cotation.assiduite }}/20
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if cotation.resultats_objectifs >= 16 %}bg-success{% elif cotation.resultats_objectifs >= 12 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ cotation.resultats_objectifs }}/20
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if cotation.valide_par %}
+                                                <span class="badge bg-success">Validée</span>
+                                                <br><small class="text-muted">{{ cotation.date_validation|date:"d/m/Y" }}</small>
+                                            {% else %}
+                                                <span class="badge bg-warning">En attente</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'hr_payroll:cotation_detail' cotation.pk %}" 
+                                                   class="btn btn-sm btn-outline-info" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'hr_payroll:cotation_update' cotation.pk %}" 
+                                                   class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                {% if not cotation.valide_par %}
+                                                    <a href="{% url 'hr_payroll:cotation_valider' cotation.pk %}" 
+                                                       class="btn btn-sm btn-outline-success" title="Valider">
+                                                        <i class="fas fa-check"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{% url 'hr_payroll:cotation_delete' cotation.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Aucune cotation trouvée</h5>
+                            <p class="text-muted">Commencez par créer votre première cotation</p>
+                            <a href="{% url 'hr_payroll:cotation_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Créer une cotation
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block hr_payroll_js %}
+<script>
+$(document).ready(function() {
+    // Initialiser DataTables si disponible
+    if ($.fn.DataTable) {
+        $('.table').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json'
+            },
+            pageLength: 25,
+            order: [[1, 'desc']]
+        });
+    }
+});
+</script>
+{% endblock %} 

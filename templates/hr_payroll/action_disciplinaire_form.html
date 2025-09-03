@@ -1,0 +1,255 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-exclamation-triangle me-2"></i>{{ title }}</h2>
+                <a href="{% url 'hr_payroll:action_disciplinaire_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>{{ title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Informations de base -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-warning"><i class="fas fa-info-circle me-2"></i>Informations de Base</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.agent.id_for_label }}" class="form-label">
+                                                <strong>Agent *</strong>
+                                            </label>
+                                            {{ form.agent }}
+                                            {% if form.agent.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.agent.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.type_faute.id_for_label }}" class="form-label">
+                                                <strong>Type de Faute *</strong>
+                                            </label>
+                                            {{ form.type_faute }}
+                                            {% if form.type_faute.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.type_faute.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.date_faute.id_for_label }}" class="form-label">
+                                                <strong>Date de la Faute *</strong>
+                                            </label>
+                                            {{ form.date_faute }}
+                                            {% if form.date_faute.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.date_faute.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.lieu_faute.id_for_label }}" class="form-label">
+                                                <strong>Lieu de la Faute</strong>
+                                            </label>
+                                            {{ form.lieu_faute }}
+                                            {% if form.lieu_faute.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.lieu_faute.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Description de la faute -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-warning"><i class="fas fa-file-alt me-2"></i>Description de la Faute</h6>
+                                        <div class="mb-3">
+                                            <label for="{{ form.description_faute.id_for_label }}" class="form-label">
+                                                <strong>Description Détaillée *</strong>
+                                            </label>
+                                            {{ form.description_faute }}
+                                            {% if form.description_faute.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.description_faute.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Décrivez en détail les circonstances de la faute</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Procédure disciplinaire -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-warning"><i class="fas fa-gavel me-2"></i>Procédure Disciplinaire</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.date_notification.id_for_label }}" class="form-label">
+                                                <strong>Date de Notification</strong>
+                                            </label>
+                                            {{ form.date_notification }}
+                                            {% if form.date_notification.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.date_notification.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Date de notification à l'agent</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.date_commission.id_for_label }}" class="form-label">
+                                                <strong>Date de Commission</strong>
+                                            </label>
+                                            {{ form.date_commission }}
+                                            {% if form.date_commission.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.date_commission.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Date de la commission disciplinaire</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                {{ form.commission_disciplinaire }}
+                                                <label class="form-check-label" for="{{ form.commission_disciplinaire.id_for_label }}">
+                                                    <strong>Commission Disciplinaire</strong>
+                                                </label>
+                                            </div>
+                                            {% if form.commission_disciplinaire.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.commission_disciplinaire.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Cochez si une commission disciplinaire est prévue</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Sanction -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-warning"><i class="fas fa-ban me-2"></i>Sanction Appliquée</h6>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.type_sanction.id_for_label }}" class="form-label">
+                                                <strong>Type de Sanction</strong>
+                                            </label>
+                                            {{ form.type_sanction }}
+                                            {% if form.type_sanction.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.type_sanction.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.duree_sanction.id_for_label }}" class="form-label">
+                                                <strong>Durée de la Sanction</strong>
+                                            </label>
+                                            {{ form.duree_sanction }}
+                                            {% if form.duree_sanction.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.duree_sanction.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Durée en jours si applicable</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="{{ form.motif_sanction.id_for_label }}" class="form-label">
+                                                <strong>Motif de la Sanction</strong>
+                                            </label>
+                                            {{ form.motif_sanction }}
+                                            {% if form.motif_sanction.errors %}
+                                            <div class="text-danger">
+                                                {% for error in form.motif_sanction.errors %}
+                                                <small>{{ error }}</small>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            <small class="text-muted">Justification de la sanction appliquée</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Boutons d'action -->
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn btn-warning btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if action %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                        <a href="{% url 'hr_payroll:action_disciplinaire_list' %}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>Annuler
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

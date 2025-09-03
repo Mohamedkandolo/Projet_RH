@@ -1,0 +1,160 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}Supprimer le Poste Budgétaire{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmation de Suppression
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Attention !
+                        </h5>
+                        <p class="mb-0">
+                            Vous êtes sur le point de supprimer le poste budgétaire suivant :
+                        </p>
+                    </div>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title text-primary">{{ poste.intitule }}</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Code :</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-info">{{ poste.code }}</span>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Type :</dt>
+                                <dd class="col-sm-8">
+                                    {% if poste.type_poste == 'PERMANENT' %}
+                                        <span class="badge bg-success">Permanent</span>
+                                    {% elif poste.type_poste == 'CONTRACTUEL' %}
+                                        <span class="badge bg-warning">Contractuel</span>
+                                    {% else %}
+                                        <span class="badge bg-info">Stagiaire</span>
+                                    {% endif %}
+                                </dd>
+                                
+                                <dt class="col-sm-4">Bureau :</dt>
+                                <dd class="col-sm-8">{{ poste.bureau.nom }}</dd>
+                                
+                                <dt class="col-sm-4">Grade Requis :</dt>
+                                <dd class="col-sm-8">{{ poste.grade_requis.nom }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    <!-- Vérifications de sécurité -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Vérifications de Sécurité
+                        </h6>
+                        <ul class="mb-0">
+                            {% if poste.agents.all %}
+                                <li class="text-danger">
+                                    <strong>⚠️ {{ poste.agents.count }} agent(s) affecté(s)</strong>
+                                    <br>
+                                    <small>La suppression de ce poste pourrait affecter les agents en poste.</small>
+                                </li>
+                            {% else %}
+                                <li class="text-success">✅ Aucun agent affecté</li>
+                            {% endif %}
+                            
+                            {% if poste.affectations.all %}
+                                <li class="text-warning">
+                                    <strong>⚠️ {{ poste.affectations.count }} affectation(s) enregistrée(s)</strong>
+                                    <br>
+                                    <small>L'historique des affectations sera conservé.</small>
+                                </li>
+                            {% else %}
+                                <li class="text-success">✅ Aucune affectation enregistrée</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Message d'avertissement -->
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Conséquences de la Suppression
+                        </h6>
+                        <ul class="mb-0">
+                            <li>Le poste sera marqué comme inactif (suppression logique)</li>
+                            <li>Les agents affectés devront être réaffectés</li>
+                            <li>L'historique sera conservé pour traçabilité</li>
+                            <li>Cette action est irréversible</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Formulaire de confirmation -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_delete" required>
+                            <label class="form-check-label" for="confirm_delete">
+                                <strong>Je confirme que je comprends les conséquences de cette suppression</strong>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_agents" required>
+                            <label class="form-check-label" for="confirm_agents">
+                                <strong>J'ai vérifié qu'aucun agent n'est actuellement affecté à ce poste</strong>
+                            </label>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'hr_payroll:poste_budgetaire_detail' poste.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger" id="delete_btn" disabled>
+                                <i class="fas fa-trash me-2"></i>Confirmer la Suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block hr_payroll_js %}
+<script>
+$(document).ready(function() {
+    // Activer le bouton de suppression seulement si toutes les cases sont cochées
+    function checkConfirmations() {
+        const confirmDelete = $('#confirm_delete').is(':checked');
+        const confirmAgents = $('#confirm_agents').is(':checked');
+        
+        if (confirmDelete && confirmAgents) {
+            $('#delete_btn').prop('disabled', false);
+        } else {
+            $('#delete_btn').prop('disabled', true);
+        }
+    }
+    
+    $('#confirm_delete, #confirm_agents').on('change', checkConfirmations);
+    
+    // Confirmation finale avant envoi
+    $('form').on('submit', function(e) {
+        if (!confirm('Êtes-vous absolument sûr de vouloir supprimer ce poste budgétaire ? Cette action est irréversible.')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %} 

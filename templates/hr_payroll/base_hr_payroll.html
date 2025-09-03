@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% block page_title %}{% endblock %} - SIGRH PAIE{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<style>
+    .sidebar {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        margin: 0.25rem 0;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .sidebar .nav-link i {
+        width: 20px;
+        margin-right: 0.5rem;
+    }
+    
+    .main-content {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border-radius: 0.5rem;
+    }
+    
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid #e9ecef;
+        border-radius: 0.5rem 0.5rem 0 0 !important;
+    }
+    
+    .btn {
+        border-radius: 0.375rem;
+        font-weight: 500;
+    }
+    
+    .table {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+        padding: 0.375em 0.75em;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -20px;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #007bff;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #007bff;
+    }
+    
+    .timeline-content {
+        padding-left: 10px;
+    }
+    
+    .progress {
+        border-radius: 0.375rem;
+    }
+    
+    .alert {
+        border-radius: 0.5rem;
+        border: none;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+    }
+    
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <div class="text-center mb-4">
+                    
+                </div>
+                
+                <ul class="nav flex-column">
+                    
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:agent_list' %}">
+                            <i class="fas fa-users"></i>
+                            Agents
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:direction_list' %}">
+                            <i class="fas fa-building"></i>
+                            Directions
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:bureau_list' %}">
+                            <i class="fas fa-sitemap"></i>
+                            Bureaux
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:grade_list' %}">
+                            <i class="fas fa-layer-group"></i>
+                            Grades
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:poste_budgetaire_list' %}">
+                            <i class="fas fa-briefcase"></i>
+                            Postes Budgétaires
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:competence_list' %}">
+                            <i class="fas fa-brain"></i>
+                            Compétences
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:formation_list' %}">
+                            <i class="fas fa-graduation-cap"></i>
+                            Formations
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:affectation_list' %}">
+                            <i class="fas fa-exchange-alt"></i>
+                            Affectations
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:promotion_list' %}">
+                            <i class="fas fa-arrow-up"></i>
+                            Promotions
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:mutation_list' %}">
+                            <i class="fas fa-random"></i>
+                            Mutations
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:cotation_list' %}">
+                            <i class="fas fa-star"></i>
+                            Cotations
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:action_disciplinaire_list' %}">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Actions Disciplinaires
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:periode_paie_list' %}">
+                            <i class="fas fa-calendar-alt"></i>
+                            Périodes de Paie
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:mouvement_paie_list' %}">
+                            <i class="fas fa-money-bill-wave"></i>
+                            Mouvements de Paie
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:calcul_paie' %}">
+                            <i class="fas fa-calculator"></i>
+                            Calcul de Paie
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:grille_salariale_list' %}">
+                            <i class="fas fa-calculator"></i>
+                            Grille Salariale
+                        </a>
+                    </li>
+
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'hr_payroll:rapports' %}">
+                            <i class="fas fa-chart-bar"></i>
+                            Rapports
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="pt-3 pb-2 mb-3">
+                {% block page_content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Marquer le lien actif dans la sidebar
+        const currentPath = window.location.pathname;
+    $('.sidebar .nav-link').each(function() {
+        const href = $(this).attr('href');
+        if (href && currentPath.includes(href.split('/')[1])) {
+            $(this).addClass('active');
+        }
+    });
+    
+    // Initialiser DataTables par défaut
+    if ($.fn.DataTable) {
+        $('.table').each(function() {
+            if (!$(this).hasClass('no-datatable')) {
+                $(this).DataTable({
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json'
+                    },
+                    pageLength: 25,
+                    responsive: true
+                });
+            }
+        });
+    }
+    });
+</script>
+{% block hr_payroll_js %}{% endblock %}
+{% endblock %} 

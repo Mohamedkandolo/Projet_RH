@@ -1,0 +1,79 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-trash me-2"></i>Supprimer la Grille Salariale</h2>
+                <a href="{% url 'hr_payroll:grille_salariale_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Confirmation de suppression
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Attention !</strong> Êtes-vous sûr de vouloir supprimer cette grille salariale ?
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Détails de la grille à supprimer :</h6>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Grade :</strong></td>
+                                            <td>{{ grille.grade.nom }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Élément de paie :</strong></td>
+                                            <td>{{ grille.element_paie.nom }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Montant :</strong></td>
+                                            <td class="fw-bold text-primary">{{ grille.montant|floatformat:2 }} FC</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Type :</strong></td>
+                                            <td>
+                                                <span class="badge {% if grille.element_paie.type_element == 'GAIN' %}bg-success{% elif grille.element_paie.type_element == 'RETENUE' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                    {{ grille.element_paie.get_type_element_display }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note :</strong> Cette action marquera la grille comme inactive au lieu de la supprimer définitivement.
+                            </div>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{% url 'hr_payroll:grille_salariale_list' %}" class="btn btn-secondary me-md-2">
+                                        <i class="fas fa-times me-1"></i>Annuler
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash me-1"></i>Confirmer la suppression
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

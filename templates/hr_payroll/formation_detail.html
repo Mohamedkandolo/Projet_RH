@@ -1,0 +1,294 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+{% block title %}{{ formation.intitule }} - Détail de la Formation{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- En-tête avec actions -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'hr_payroll:formation_list' %}">Formations</a></li>
+                            <li class="breadcrumb-item active">{{ formation.intitule }}</li>
+                        </ol>
+                    </nav>
+                    <h2 class="mb-0">
+                        <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                        {{ formation.intitule }}
+                    </h2>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'hr_payroll:formation_update' formation.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Modifier
+                    </a>
+                    <a href="{% url 'hr_payroll:formation_delete' formation.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Supprimer
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informations principales -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Informations Générales
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Code :</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-info fs-6">{{ formation.code }}</span>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Type :</dt>
+                                        <dd class="col-sm-8">
+                                            {% if formation.type_formation == 'INTERNE' %}
+                                                <span class="badge bg-primary">Interne</span>
+                                            {% elif formation.type_formation == 'EXTERNE' %}
+                                                <span class="badge bg-warning">Externe</span>
+                                            {% elif formation.type_formation == 'CERTIFICATION' %}
+                                                <span class="badge bg-success">Certification</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Conférence</span>
+                                            {% endif %}
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Statut :</dt>
+                                        <dd class="col-sm-8">
+                                            {% if formation.statut == 'PLANIFIEE' %}
+                                                <span class="badge bg-info">Planifiée</span>
+                                            {% elif formation.statut == 'EN_COURS' %}
+                                                <span class="badge bg-warning">En cours</span>
+                                            {% elif formation.statut == 'TERMINEE' %}
+                                                <span class="badge bg-success">Terminée</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Annulée</span>
+                                            {% endif %}
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Durée :</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge bg-secondary">{{ formation.duree_heures }}h</span>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Places :</dt>
+                                        <dd class="col-sm-8">{{ formation.nombre_places }}</dd>
+                                        
+                                        <dt class="col-sm-4">Coût estimé :</dt>
+                                        <dd class="col-sm-8">{{ formation.cout_estime|default:"Non spécifié" }} €</dd>
+                                        
+                                        <dt class="col-sm-4">Lieu :</dt>
+                                        <dd class="col-sm-8">{{ formation.lieu|default:"Non spécifié" }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Période de formation -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>Période de Formation
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-6">
+                                    <div class="border-end">
+                                        <h6 class="text-muted">Date de début</h6>
+                                        <h4 class="text-primary">{{ formation.date_debut|date:"d/m/Y" }}</h4>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted">Date de fin</h6>
+                                    <h4 class="text-success">{{ formation.date_fin|date:"d/m/Y" }}</h4>
+                                </div>
+                            </div>
+                            
+                            <!-- Barre de progression -->
+                            {% now "Y-m-d" as today %}
+                            {% if formation.date_debut|date:"Y-m-d" <= today and formation.date_fin|date:"Y-m-d" >= today %}
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Progression</small>
+                                        <small class="text-muted">
+                                            {% widthratio formation.date_debut|timesince:today formation.date_debut|timesince:formation.date_fin 100 %}%
+                                        </small>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-warning" role="progressbar" 
+                                             style="width: {% widthratio formation.date_debut|timesince:today formation.date_debut|timesince:formation.date_fin 100 %}%">
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Description détaillée -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-align-left me-2"></i>Description Détaillée
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ formation.description|linebreaks }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Participants -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>Participants ({{ formation.participants.count }}/{{ formation.nombre_places }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if formation.participants.all %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Agent</th>
+                                                <th>Grade</th>
+                                                <th>Bureau</th>
+                                                <th>Statut</th>
+                                                <th>Note</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for participation in formation.participants.all %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'hr_payroll:agent_detail' participation.agent.pk %}" class="text-decoration-none">
+                                                        {{ participation.agent.nom_complet }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ participation.agent.grade.nom }}</td>
+                                                <td>{{ participation.agent.bureau.nom }}</td>
+                                                <td>
+                                                    {% if participation.statut_participation == 'TERMINEE' %}
+                                                        <span class="badge bg-success">Terminée</span>
+                                                    {% elif participation.statut_participation == 'EN_COURS' %}
+                                                        <span class="badge bg-warning">En cours</span>
+                                                    {% else %}
+                                                        <span class="badge bg-info">{{ participation.get_statut_participation_display }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if participation.note_formation %}
+                                                        <span class="badge {% if participation.note_formation >= 16 %}bg-success{% elif participation.note_formation >= 12 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                            {{ participation.note_formation }}/20
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">Aucun participant inscrit pour le moment.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar avec informations complémentaires -->
+                <div class="col-lg-4">
+                    <!-- Statistiques -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Statistiques
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h4 class="text-primary mb-0">{{ formation.participants.count }}</h4>
+                                        <small class="text-muted">Inscrits</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-success mb-0">{{ formation.nombre_places }}</h4>
+                                    <small class="text-muted">Places</small>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h4 class="text-warning mb-0">{{ formation.duree_heures }}h</h4>
+                                        <small class="text-muted">Durée</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-info mb-0">{{ formation.cout_estime|default:"-" }} €</h4>
+                                    <small class="text-muted">Coût</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions rapides -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>Actions Rapides
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'hr_payroll:participation_formation_create' %}?formation={{ formation.pk }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-user-plus me-2"></i>Inscrire un agent
+                                </a>
+                                <a href="{% url 'hr_payroll:formation_list' %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list me-2"></i>Retour à la liste
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations de traçabilité -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-history me-2"></i>Traçabilité
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Créé le :</dt>
+                                <dd class="col-sm-8">{{ formation.date_creation|date:"d/m/Y H:i" }}</dd>
+                                
+                                <dt class="col-sm-4">Modifié le :</dt>
+                                <dd class="col-sm-8">{{ formation.date_modification|date:"d/m/Y H:i" }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

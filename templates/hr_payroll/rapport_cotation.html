@@ -1,0 +1,290 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Rapport des Cotations - Évaluation des Performances{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Rapport des Cotations - Évaluation des Performances
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                {{ form.annee|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.semestre|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.bureau|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.grade|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                {{ form.periode_evaluation|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.note_min|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.note_max|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.statut_validation|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Générer le Rapport
+                                </button>
+                                <a href="{% url 'hr_payroll:rapport_cotation' %}" class="btn btn-secondary ms-2">
+                                    <i class="fas fa-refresh me-2"></i>Réinitialiser
+                                </a>
+                                {% if request.GET %}
+                                    <button type="button" class="btn btn-success ms-2" onclick="exportToExcel()">
+                                        <i class="fas fa-file-excel me-2"></i>Exporter Excel
+                                    </button>
+                                    <button type="button" class="btn btn-danger ms-2" onclick="exportToPDF()">
+                                        <i class="fas fa-file-pdf me-2"></i>Exporter PDF
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+
+                    {% if request.GET %}
+                        <hr>
+                        
+                        <!-- Résumé statistique -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h4 class="card-title">{{ total_cotations }}</h4>
+                                        <p class="card-text">Total Cotations</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h4 class="card-title">{{ moyenne_globale|floatformat:2 }}/20</h4>
+                                        <p class="card-text">Moyenne Globale</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h4 class="card-title">{{ cotations_validees }}</h4>
+                                        <p class="card-text">Validées</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h4 class="card-title">{{ cotations_en_attente }}</h4>
+                                        <p class="card-text">En Attente</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Graphiques -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Répartition par Note</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="chartNotes" width="400" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="card-title mb-0">Répartition par Bureau</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="chartBureaux" width="400" height="200"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tableau détaillé -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Détail des Cotations</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if cotations %}
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover" id="tableCotations">
+                                            <thead class="table-dark">
+                                                <tr>
+                                                    <th>Agent</th>
+                                                    <th>Bureau</th>
+                                                    <th>Grade</th>
+                                                    <th>Période</th>
+                                                    <th>Note Globale</th>
+                                                    <th>Comportement</th>
+                                                    <th>Assiduité</th>
+                                                    <th>Résultats</th>
+                                                    <th>Qualité</th>
+                                                    <th>Esprit d'Équipe</th>
+                                                    <th>Validation</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for cotation in cotations %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            {% if cotation.agent.photo_identite %}
+                                                                <img src="{{ cotation.agent.photo_identite.url }}" 
+                                                                     class="rounded-circle me-2" width="24" height="24" 
+                                                                     alt="{{ cotation.agent.nom_complet }}">
+                                                            {% else %}
+                                                                <div class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center" 
+                                                                     style="width: 24px; height: 24px;">
+                                                                    <i class="fas fa-user text-white fa-sm"></i>
+                                                                </div>
+                                                            {% endif %}
+                                                            <span>{{ cotation.agent.nom_complet }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>{{ cotation.agent.bureau.nom }}</td>
+                                                    <td>{{ cotation.agent.grade.nom }}</td>
+                                                    <td>
+                                                        {{ cotation.annee }}
+                                                        {% if cotation.semestre %}{{ cotation.get_semestre_display }}{% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if cotation.note_globale %}
+                                                            <span class="badge {% if cotation.note_globale >= 16 %}bg-success{% elif cotation.note_globale >= 12 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                                {{ cotation.note_globale }}/20
+                                                            </span>
+                                                        {% else %}
+                                                            <span class="text-muted">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ cotation.comportement_professionnel }}/20</td>
+                                                    <td>{{ cotation.assiduite }}/20</td>
+                                                    <td>{{ cotation.resultats_objectifs }}/20</td>
+                                                    <td>{{ cotation.qualite_travail }}/20</td>
+                                                    <td>{{ cotation.esprit_equipe }}/20</td>
+                                                    <td>
+                                                        {% if cotation.valide_par %}
+                                                            <span class="badge bg-success">Validée</span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning">En attente</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                                        <h6 class="text-muted">Aucune cotation trouvée avec les critères sélectionnés</h6>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block hr_payroll_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialiser DataTables si disponible
+    if ($.fn.DataTable && $('#tableCotations').length) {
+        $('#tableCotations').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json'
+            },
+            pageLength: 25,
+            order: [[4, 'desc']]
+        });
+    }
+
+    // Graphiques si des données sont disponibles
+    if (document.getElementById('chartNotes')) {
+        // Graphique des notes
+        const ctxNotes = document.getElementById('chartNotes').getContext('2d');
+        new Chart(ctxNotes, {
+            type: 'bar',
+            data: {
+                labels: ['0-5', '6-10', '11-15', '16-20'],
+                datasets: [{
+                    label: 'Nombre d\'agents',
+                    data: [5, 10, 15, 20],
+                    backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#198754']
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    if (document.getElementById('chartBureaux')) {
+        // Graphique des bureaux
+        const ctxBureaux = document.getElementById('chartBureaux').getContext('2d');
+        new Chart(ctxBureaux, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bureau 1', 'Bureau 2', 'Bureau 3'],
+                datasets: [{
+                    data: [10, 15, 8],
+                    backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+});
+
+function exportToExcel() {
+    // Logique d'export Excel
+    alert('Fonctionnalité d\'export Excel à implémenter');
+}
+
+function exportToPDF() {
+    // Logique d'export PDF
+    alert('Fonctionnalité d\'export PDF à implémenter');
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,163 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+
+
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-brain me-2"></i>
+                        {{ title|default:"Compétence" }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Informations de base -->
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Informations de Base
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.code.id_for_label }}" class="form-label">
+                                        <strong>Code *</strong>
+                                    </label>
+                                    {{ form.code }}
+                                    {% if form.code.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.code.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.nom.id_for_label }}" class="form-label">
+                                        <strong>Nom *</strong>
+                                    </label>
+                                    {{ form.nom }}
+                                    {% if form.nom.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.nom.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.categorie.id_for_label }}" class="form-label">
+                                        <strong>Catégorie *</strong>
+                                    </label>
+                                    {{ form.categorie }}
+                                    {% if form.categorie.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.categorie.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Niveau et description -->
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-chart-line me-2"></i>Niveau et Description
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.niveau_expertise.id_for_label }}" class="form-label">
+                                        <strong>Niveau d'Expertise *</strong>
+                                    </label>
+                                    {{ form.niveau_expertise }}
+                                    {% if form.niveau_expertise.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.niveau_expertise.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.actif }}
+                                        <label class="form-check-label" for="{{ form.actif.id_for_label }}">
+                                            <strong>Actif</strong>
+                                        </label>
+                                    </div>
+                                    {% if form.actif.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.actif.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Description détaillée -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-align-left me-2"></i>Description Détaillée
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.description.id_for_label }}" class="form-label">
+                                        <strong>Description *</strong>
+                                    </label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        Décrivez en détail la compétence, ses objectifs et ses critères d'évaluation
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'hr_payroll:competence_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Annuler
+                                    </a>
+                                    <div>
+                                        {% if competence %}
+                                            <a href="{% url 'hr_payroll:competence_detail' competence.pk %}" class="btn btn-outline-info me-2">
+                                                <i class="fas fa-eye me-2"></i>Voir
+                                            </a>
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if competence %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,199 @@
+{% extends 'hr_payroll/base_hr_payroll.html' %}
+{% load static %}
+
+
+{% block title %}{{ title|default:"Formation" }}{% endblock %}
+
+{% block page_content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        {{ title|default:"Formation" }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Informations de base -->
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Informations de Base
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <h5 class="text-primary mb-3">Code</h5/>
+                                    {{ form.code }}
+                                    
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h5 class="text-primary mb-3">Intitulé</h5/>
+                                    {{ form.intitule }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.type_formation }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.statut }}
+                                </div>
+                            </div>
+                            
+                            <!-- Informations pratiques -->
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-calendar-alt me-2"></i>Informations Pratiques
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    {{ form.date_debut }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.date_fin }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h5 class="text-primary mb-3">Durée</h5/>
+                                    {{ form.duree_heures }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <h5 class="text-primary mb-3">Nombre de Places</h5/>
+                                    {{ form.nombre_places }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- Description et coûts -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-align-left me-2"></i>Description
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    {{ form.description }}
+                                    <small class="form-text text-muted">
+                                        Décrivez en détail le contenu et les objectifs de la formation
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-euro-sign me-2"></i>Coûts et Lieu
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    {{ form.cout_estime }}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.lieu }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Boutons d'action -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'hr_payroll:formation_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Annuler
+                                    </a>
+                                    <div>
+                                        {% if formation %}
+                                            <a href="{% url 'hr_payroll:formation_detail' formation.pk %}" class="btn btn-outline-info me-2">
+                                                <i class="fas fa-eye me-2"></i>Voir
+                                            </a>
+                                        {% endif %}
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if formation %}Mettre à jour{% else %}Créer{% endif %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block hr_payroll_js %}
+<script>
+$(document).ready(function() {
+    // Validation en temps réel
+    $('form').on('submit', function(e) {
+        let isValid = true;
+        
+        // Vérifier les champs obligatoires
+        $('.form-control[required]').each(function() {
+            if (!$(this).val()) {
+                $(this).addClass('is-invalid');
+                isValid = false;
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        
+        // Vérifier que la date de fin est après la date de début
+        const dateDebut = new Date($('#id_date_debut').val());
+        const dateFin = new Date($('#id_date_fin').val());
+        
+        if (dateFin <= dateDebut) {
+            $('#id_date_fin').addClass('is-invalid');
+            isValid = false;
+        } else {
+            $('#id_date_fin').removeClass('is-invalid');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            $('html, body').animate({
+                scrollTop: $('.is-invalid').first().offset().top - 100
+            }, 500);
+        }
+    });
+    
+    // Auto-complétion du code si vide
+    $('#id_intitule').on('input', function() {
+        if (!$('#id_code').val()) {
+            let code = $(this).val().substring(0, 8).toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (code.length >= 3) {
+                $('#id_code').val(code);
+            }
+        }
+    });
+    
+    // Calcul automatique de la durée si les dates sont renseignées
+    $('#id_date_debut, #id_date_fin').on('change', function() {
+        const dateDebut = new Date($('#id_date_debut').val());
+        const dateFin = new Date($('#id_date_fin').val());
+        
+        if (dateDebut && dateFin && dateFin > dateDebut) {
+            const diffTime = Math.abs(dateFin - dateDebut);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const heuresEstimees = diffDays * 8; // Estimation de 8h par jour
+            
+            if (!$('#id_duree_heures').val()) {
+                $('#id_duree_heures').val(heuresEstimees);
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 
