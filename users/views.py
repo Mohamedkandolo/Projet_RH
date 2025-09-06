@@ -33,7 +33,7 @@ User = get_user_model()
 def login_view(request):
     """Vue de connexion personnalisée"""
     if request.user.is_authenticated:
-        return redirect('hr_payroll:tableau_bord')
+        return redirect('hr_payroll:home')
     
     if request.method == 'POST':
         form = LoginForm(request.POST)

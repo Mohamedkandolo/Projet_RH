@@ -18,6 +18,9 @@ class Customer(AbstractUser):
         verbose_name_plural = ("UTILISATEURS")
         ordering = ["username"]
 
+
+    objects = UserManager()
+
     """@property
     def __str__(self):
         return f'{self.username}'"""
