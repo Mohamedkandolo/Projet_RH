@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # Configuration des hôtes autorisés
 ALLOWED_HOSTS = ['*']
@@ -131,6 +131,43 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.Customer'
+
+
+
+# Login/Logout URLs
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+
+
+
+
+# Configuration Email pour la réinitialisation de mot de passe
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Ou votre serveur SMTP
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'votre-email@gmail.com'  # À configurer
+EMAIL_HOST_PASSWORD = 'votre-mot-de-passe-app'  # À configurer
+DEFAULT_FROM_EMAIL = 'Système d\'Archivage <noreply@archivage.com>'
+
+
+
+# Configuration pour le développement (console)
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    # Éviter l'affichage multiple du message
+    import sys
+    if 'runserver' in sys.argv:
+        # Utiliser une variable globale pour éviter l'affichage multiple
+        if not globals().get('_email_warning_shown'):
+            print("⚠️  Mode développement : Les emails seront affichés dans la console")
+            globals()['_email_warning_shown'] = True
+
+# Configuration des URLs de réinitialisation de mot de passe
+PASSWORD_RESET_TIMEOUT = 86400  # 24 heures en secondes
+
 
 
 
